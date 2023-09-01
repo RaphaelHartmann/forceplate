@@ -62,3 +62,6 @@ check_named_list_functions <- function(x) {
   }
 }
 
+check_character_in_colnames <- function(patterns, names) {
+  if (any(!patterns %in% names)) stop(paste0("colnames must include subj, block, and trial"))
+}
