@@ -54,7 +54,7 @@ prep_bw_data <- function(filenames, n.trials,
   samp.factor <- sampling.freq/1000
   cols <- c("Fx", "Fy", "Mx", "My", "Mz", "CoPx", "CoPy")
   colsnew <- paste0(cols, "_bc")
-  col.names.filter <- c("Fx", "Fy", "Fz", "|Ft|", "Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4", "Mx", "My", "Mz", "Tz", "Ax", "Ay", "Cofx", "Cofy", "|Cofxy|")
+  col.names.filter <- c("Fx", "Fy", "Fz", "|Ft|", "Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4", "Mx", "My", "Mz", "Tz", "Ax", "Ay", "Cofx", "Cofy", "|Cofxy|", "CoPx", "CoPy")
   bf <- butter(n = 4, W = cutoff.freq/(sampling.freq/2), type="low")
 
   # LIST (OF DATA.TABLE OBJECTS) CONTAINING ALL SUBJECTS AND BLOCKS
