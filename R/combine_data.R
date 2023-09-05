@@ -1,5 +1,5 @@
 
-#' @importFrom data.table setcolorder rbindlist fintersect merge
+#' @importFrom data.table setcolorder rbindlist fintersect
 combine_data <- function(dt1, dt2) {
   
   # GET COLUMN NAMES

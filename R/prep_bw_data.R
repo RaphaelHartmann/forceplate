@@ -2,6 +2,7 @@
 # filenames must be of the form "xyzsubj<subjNR>block<blockNR>",
 #   where both
 #' @importFrom data.table fread ":=" rbindlist setorder copy setnames setcolorder
+#' @importFrom signal filter butter
 prep_bw_data <- function(filenames, n.trials,
                          baseline.trigger, baseline.intv,
                          start.trigger, start.prepend = 0,
@@ -158,9 +159,9 @@ prep_bw_data <- function(filenames, n.trials,
       for (j in 1:length(trial.ind)) {
         bioware.dt$bioware[[j]][, c("dCoPx", "dCoPy") := .(c(diff(CoPx), NaN), c(diff(CoPy), NaN))]
         bioware.dt$bioware[[j]][, c("dCoPx", "dCoPy") := .(dCoPx - meansdiff[[j]]$CoPx, dCoPy - meansdiff[[j]]$CoPy)]
-        bioware.dt$bioware[[j]][, c("Fx", "Fy", "Mx", "My", "Mz", "CoPx", "CoPy") := .(Fx - means[[j]]$Fx, Fy - means[[j]]$Fy,
-                                                                                       Mx - means[[j]]$Mx, My - means[[j]]$My, Mz - means[[j]]$Mz,
-                                                                                       CoPx - means[[j]]$CoPx, CoPy - means[[j]]$CoPy)]
+        bioware.dt$bioware[[j]][, cols := .(Fx - means[[j]]$Fx, Fy - means[[j]]$Fy,
+                                            Mx - means[[j]]$Mx, My - means[[j]]$My, Mz - means[[j]]$Mz,
+                                            CoPx - means[[j]]$CoPx, CoPy - means[[j]]$CoPy)]
         setnames(bioware.dt$bioware[[j]], c(cols, "dCoPx", "dCoPy"), c(colsnew, "dCoPx_bc", "dCoPy_bc"))
       }
     }
