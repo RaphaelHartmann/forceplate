@@ -9,7 +9,7 @@ prep_bw_data <- function(filenames, n.trials,
                          cond.trigger.list,
                          na.strings = NULL, skip = 19, az0 = -41,
                          # col.names = NULL,
-                         sort = TRUE, sampling.freq = 1000,
+                         sort = TRUE, sampling.freq = 1000, cutoff.freq = 10,
                          verbose = FALSE) {
 
   # CHECKS
@@ -31,7 +31,7 @@ prep_bw_data <- function(filenames, n.trials,
 
   # CREATE RESULTING DATA.TABLE
   final.bioware.dt <- data.table()
-
+  
   # PREPARE FILENAMES
   length.fn <- length(filenames)
   fn.info <- extract_info_fn(filenames)
@@ -54,6 +54,8 @@ prep_bw_data <- function(filenames, n.trials,
   samp.factor <- sampling.freq/1000
   cols <- c("Fx", "Fy", "Mx", "My", "Mz", "CoPx", "CoPy")
   colsnew <- paste0(cols, "_bc")
+  col.names.filter <- c("Fx", "Fy", "Fz", "|Ft|", "Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4", "Mx", "My", "Mz", "Tz", "Ax", "Ay", "Cofx", "Cofy", "|Cofxy|")
+  bf <- butter(n = 4, W = cutoff.freq/(sampling.freq/2), type="low")
 
   # LIST (OF DATA.TABLE OBJECTS) CONTAINING ALL SUBJECTS AND BLOCKS
   list.bioware.dt <- list()
@@ -77,8 +79,11 @@ prep_bw_data <- function(filenames, n.trials,
     # COMPUTE SOME VARIABLES
     tmp.dt[, CoPx:=(Fx*az0 - My*1000)/(Fz)]
     tmp.dt[, CoPy:=(Fy*az0 + Mx*1000)/(Fz)]
-    tmp.dt[, Tz_new:=(Mz)*1000 - (Fy)*(CoPx) + (Fx)*(CoPy)]
-
+    # tmp.dt[, Tz_new:=(Mz)*1000 - (Fy)*(CoPx) + (Fx)*(CoPy)]
+    
+    # LOW-PASS FILTER (BUTTERWORTH 4TH ORDER)
+    tmp.dt[, col.names.filter := lapply(.SD, function(x) filter(bf, x)), .SDcols = col.names.filter]    
+    
     # CALCULATE EVENTS BY TRANSFORMATION OF PORT AND BYTE TO DECIMAL
     byte <- tmp.dt[, lapply(.SD, function(x) x > 1.5), .SDcols = port.ind]
     tmp.dt[, events := event_encoder(byte = byte, port.ind = port.ind)]
