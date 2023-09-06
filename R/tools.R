@@ -122,4 +122,33 @@ create_sublist <- function(mat.names, n.dt.rows, fun.names) {
   return(sublist)
 }
 
+#' @importFrom signal filter
+filter_w_padding <- function(bf, vec) {
+  
+  len.vec <- length(vec)
+  j <- ifelse(len.vec < 2000, len.vec, 2000)
+  
+  tmp.vec <- c(rev(head(vec, j)[-1]), vec)
+  
+  # first pass filtering
+  vec <- tail(filter(bf, tmp.vec), len.vec)
+  
+  # reverse for second pass filtering
+  vec <- rev(vec)
+  tmp.vec <- c(rev(head(vec, j)[-1]), vec)
+  
+  # second pass filtering
+  vec <- tail(filter(bf, tmp.vec), len.vec)
+  
+  return(rev(vec))
+  
+}
+
+
+
+
+
+
+
+
 

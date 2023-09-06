@@ -2,7 +2,7 @@
 # filenames must be of the form "xyzsubj<subjNR>block<blockNR>",
 #   where both
 #' @importFrom data.table fread ":=" rbindlist setorder copy setnames setcolorder
-#' @importFrom signal filter butter
+#' @importFrom signal butter
 prep_bw_data <- function(filenames, n.trials,
                          baseline.trigger, baseline.intv,
                          start.trigger, start.prepend = 0,
@@ -55,7 +55,7 @@ prep_bw_data <- function(filenames, n.trials,
   samp.factor <- sampling.freq/1000
   cols <- c("Fx", "Fy", "Mx", "My", "Mz", "CoPx", "CoPy")
   colsnew <- paste0(cols, "_bc")
-  col.names.filter <- c("Fx", "Fy", "Fz", "|Ft|", "Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4", "Mx", "My", "Mz", "Tz", "Ax", "Ay", "Cofx", "Cofy", "|Cofxy|", "CoPx", "CoPy")
+  col.names.filter <- c("Fx", "Fy", "Fz", "|Ft|", "Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4", "Mx", "My", "Mz", "Tz", "Ax", "Ay", "Cofx", "Cofy", "|Cofxy|")
   bf <- butter(n = 4, W = cutoff.freq/(sampling.freq/2), type="low")
 
   # LIST (OF DATA.TABLE OBJECTS) CONTAINING ALL SUBJECTS AND BLOCKS
@@ -76,15 +76,15 @@ prep_bw_data <- function(filenames, n.trials,
     }
     # }
     tmp.dt <- fread(filenames[i], na.strings = na.strings, skip = skip, col.names = tmp.col.names)
-
+    
+    # LOW-PASS FILTER (BUTTERWORTH 4TH ORDER)
+    tmp.dt[, col.names.filter := lapply(.SD, function(x) filter_w_padding(bf, x)), .SDcols = col.names.filter]    
+    
     # COMPUTE SOME VARIABLES
     tmp.dt[, CoPx:=(Fx*az0 - My*1000)/(Fz)]
     tmp.dt[, CoPy:=(Fy*az0 + Mx*1000)/(Fz)]
     # tmp.dt[, Tz_new:=(Mz)*1000 - (Fy)*(CoPx) + (Fx)*(CoPy)]
-    
-    # LOW-PASS FILTER (BUTTERWORTH 4TH ORDER)
-    tmp.dt[, col.names.filter := lapply(.SD, function(x) filter(bf, x)), .SDcols = col.names.filter]    
-    
+
     # CALCULATE EVENTS BY TRANSFORMATION OF PORT AND BYTE TO DECIMAL
     byte <- tmp.dt[, lapply(.SD, function(x) x > 1.5), .SDcols = port.ind]
     tmp.dt[, events := event_encoder(byte = byte, port.ind = port.ind)]
