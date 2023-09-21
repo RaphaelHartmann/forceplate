@@ -106,6 +106,7 @@ time_lock_fp_data <- function(fp.dt, vars,
   gc()
 
   # SAVE AS LARGE DATA.TABLE
+  class(fp.dt) <- c(class(fp.dt), "fp.tl")
   return(0)
 
 }

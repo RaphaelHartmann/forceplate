@@ -62,6 +62,7 @@ prep_exp_data <- function(filenames,
 
   }
 
+  class(complete.experimental.dt) <- c(class(complete.experimental.dt), "exp.prepared")
   return(complete.experimental.dt)
 
 }

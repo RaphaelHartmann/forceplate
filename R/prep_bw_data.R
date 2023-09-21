@@ -260,6 +260,8 @@ segment_fp_data <- function(filenames, n.trials,
   gc()
 
   # SAVE ALL IN ONE LARGE DATA.TABLE
-  return(rbindlist(list.bioware.dt))
+  dt.final <- rbindlist(list.bioware.dt)
+  class(dt.final) <- c(class(dt.final), "fp.segmented")
+  return(dt.final)
 
 }
