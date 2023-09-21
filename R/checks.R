@@ -1,3 +1,15 @@
+check_subj_in_character <- function(x) {
+  if (!all(grepl("subj[0-9]+", filenames))) stop(paste0("all ", deparse(substitute(x)), " must contain \"subj\" directly followed by a number"))
+}
+
+check_block_in_character <- function(x) {
+  for (i in 1:length(x)) {
+    if (grepl("block", x[i])) {
+      if (!grepl("block[0-9]+", x[i])) stop(paste0("if one element of ", deparse(substitute(x)), " contains \"block\" it must be directly followed by a number"))
+    }
+  }
+  if (!all(grepl("subj[0-9]+", filenames))) stop(paste0("all ", deparse(substitute(x)), " must contain \"subj\" directly followed by a number"))
+}
 
 check_character_vector <- function(x) {
   if (!is.character(x)) stop(paste0(deparse(substitute(x)), " must be a (vector of) character(s)"))
@@ -24,7 +36,7 @@ check_numeric_element <- function(x) {
 check_interval <- function(x) {
   if (!is.numeric(x)) stop(paste0(deparse(substitute(x)), " must be a numeric vector of length 2"))
   if (length(x) != 2) stop(paste0(deparse(substitute(x)), " must be a numeric vector of length 2"))
-  if (x[1] > x[2]) stop(paste0(deparse(substitute(x)), " is not a valid interval"))
+  if (x[1] >= x[2]) stop(paste0(deparse(substitute(x)), " is not a valid interval"))
 }
 
 check_named_list_vectors <- function(x) {
@@ -32,6 +44,18 @@ check_named_list_vectors <- function(x) {
   if (any(names(x)=="")) stop(paste0(deparse(substitute(x)), " must be a named list of numeric vectors/elements"))
   for (ind in 1:length(x)) {
     if (!is.numeric(x[[ind]])) stop(paste0(names(x)[ind], " of ", deparse(substitute(x)), " must be a numeric (vector)"))
+  }
+}
+
+check_potential_named_list_vectors <- function(x) {
+  if (is.list(x)) {
+    if (length(x) > 1) {
+      check_named_list_vectors(x)
+    } else {
+      check_numeric_vector(x[[1]])
+    }
+  } else {
+    check_numeric_vector(x)
   }
 }
 

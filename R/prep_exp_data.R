@@ -2,7 +2,7 @@
 #' @importFrom data.table fread ":=" rbindlist setorder
 #' @importFrom stats complete.cases
 prep_exp_data <- function(filenames,
-                          na.strings = c("[]", "None"),
+                          na.strings = c(",,", "[]", "None"),
                           excl.vars = NULL,
                           blacklist.vars = NULL,
                           whitelist.vars = NULL,
@@ -48,7 +48,7 @@ prep_exp_data <- function(filenames,
       suppressWarnings(experimental.dt[, (blacklist.vars) := NULL])
       if (!is.null(whitelist.vars)) message("whitelist.vars is ignored since blacklist.vars is provided")
     } else if (!is.null(whitelist.vars)) {
-      bl.vars <- setdiff(names(experimental.dt), whitelist.vars)
+      bl.vars <- setdiff(names(experimental.dt), blacklist.vars)
       suppressWarnings(experimental.dt[, (blacklist.vars) := NULL])
     }
 

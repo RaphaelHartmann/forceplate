@@ -125,6 +125,23 @@ create_sublist <- function(mat.names, n.dt.rows, fun.names) {
 #' @importFrom signal filter
 filter_w_padding <- function(bf, vec) {
   
+  NA_FLAG <- FALSE
+  ind.NA <- NULL
+  ind.0 <- NULL
+  ind.excl <- NULL
+  ind.orig <- NULL
+  
+  ret.vec <- vec
+  
+  if (any(vec==0) | any(is.na(vec))) {
+    NA_FLAG <- TRUE
+    ind.NA <- which(is.na(vec))
+    ind.0 <- which(vec==0)
+    ind.excl <- c(ind.NA, ind.0)
+    ind.keep <- setdiff(seq_along(vec), ind.excl)
+    vec <- vec[ind.keep]
+  }
+  
   len.vec <- length(vec)
   j <- ifelse(len.vec < 2000, len.vec, 2000)
   
@@ -140,7 +157,17 @@ filter_w_padding <- function(bf, vec) {
   # second pass filtering
   vec <- tail(filter(bf, tmp.vec), len.vec)
   
-  return(rev(vec))
+  # reverse back
+  vec <- rev(vec)
+  
+  if (NA_FLAG) {
+    tmp.vec <- numeric(length = len.vec+length(ind.excl))
+    if (length(ind.NA) > 0) tmp.vec[ind.NA] <- NA
+    tmp.vec[ind.keep] <- vec
+    return(tmp.vec)
+  } else {
+    return(vec)
+  }
   
 }
 
