@@ -105,6 +105,15 @@ segment_fp_data <- function(filenames, n.trials,
     # READ IN FILE BY NAME
     tmp.dt <- fread(filenames[i], skip = skip, col.names = new.names) #, na.strings = na.strings)
     
+    # CHECK TIME VARIABLE
+    if (any(!(1:(nrow(tmp.dt)-2))/sampling.freq %in% tmp.dt[[time.name]])) message(paste0(filenames[i], " might have missing values or your sampling.freq is not correctly set"))
+    if (any(is.na(tmp.dt[[time.name]]))) {
+      na.logic <- is.na(tmp.dt[[time.name]])
+      na.info <- rle(na.logic)
+      first.non.na <- which(!isTRUE(na.info$values) & na.info$lengths > 1)[1]
+      
+    }
+    
     # IMPUTATION IF WANTED
     if (!is.null(imputation)) tmp.dt[, (measure.names) := lapply(.SD, function(x) spline(x = tmp.dt[[time.name]], y = x, xout = tmp.dt[[time.name]], method = imputation)$y), .SDcols = measure.names]
     
@@ -282,6 +291,11 @@ segment_fp_data <- function(filenames, n.trials,
   # SAVE ALL IN ONE LARGE DATA.TABLE
   dt.final <- rbindlist(list.bioware.dt)
   class(dt.final) <- c(class(dt.final), "fp.segmented")
+  attributes(dt.final) <- list(baseline.correction = ifelse(all(baseline.trigger==0), "FALSE", "TRUE"),
+                               center.of.pressure = ifelse(az0, "TRUE", "FALSE"),
+                               filter = ifelse(cutoff.freq, as.character(cutoff.freq), "FALSE"),
+                               sorting = as.character(sort),
+                               imputatation = ifelse(is.null(imputation), "FALSE", imputation))
   return(dt.final)
   
 }
