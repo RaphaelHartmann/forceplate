@@ -3,21 +3,21 @@
 extract_info_fn <- function(filenames) {
   # Extract subjNR
   subjNR <- as.numeric(gsub(".*subj([0-9]+).*", "\\1", filenames))
-
+  
   # Extract blockNR if "block" is present, else NA
   suppressWarnings(
     blockNR <- fifelse(grepl("block", filenames),
-                      as.numeric(gsub(".*block([0-9]+).*", "\\1", filenames)),
-                      NaN)
+                       as.numeric(gsub(".*block([0-9]+).*", "\\1", filenames)),
+                       NaN)
   )
-
+  
   # Return results as a data frame
   return(data.table(subjNR = subjNR, blockNR = blockNR))
 }
 
 
 clean_rle <- function(rle) {
-
+  
   ind <- which(rle$lengths < 3)
   for (i in ind) { # for-loop intended because of sequence effects
     if (i < length(rle$lengths)) {
@@ -27,7 +27,7 @@ clean_rle <- function(rle) {
   rle$lengths <- rle$lengths[-ind]
   rle$values <- rle$values[-ind]
   return(rle)
-
+  
 }
 
 vec_seq <- Vectorize(seq.default, vectorize.args = c("from", "to"), SIMPLIFY = FALSE)
@@ -65,19 +65,19 @@ event_transcription <- function(dt, correction = TRUE, verbose = FALSE) {
 
 #' @importFrom data.table ":="
 make_bins <- function(bins, bin.width = NULL, n.bins = NULL, sampling.freq = 1000) {
-
+  
   sampling.factor <- sampling.freq/1000
-
+  
   if (is.list(bins)) {
     if (any(unlist(lapply(bins, length)) != 2)) stop("bins must consist of vectors with length 2")
   } else {
     if (length(bins) != 2) stop("bins must be a vector or a list of vectors with length 2")
   }
-
+  
   if (!is.list(bins)) bins <- list(bins)
-
+  
   bins.dp <- lapply(bins, function(x) {floor(x*sampling.factor)})
-
+  
   if ((is.null(bin.width) & is.null(n.bins)) | length(bins.dp) > 1) {
     return(bins.dp)
   } else if (!is.null(bin.width)) {
@@ -102,7 +102,7 @@ make_bins <- function(bins, bin.width = NULL, n.bins = NULL, sampling.freq = 100
     bin.dp.bounds[, upper := lower + (bin.width.dp-1)]
     return(apply(bin.dp.bounds, 1, FUN = function(x) x, simplify = FALSE))
   }
-
+  
 }
 
 # create_sublist <- function(vec.names, vec.len) {
@@ -123,23 +123,22 @@ create_sublist <- function(mat.names, n.dt.rows, fun.names) {
 }
 
 #' @importFrom signal filter
-filter_w_padding <- function(bf, vec) {
+filter_w_padding <- function(bf, vec, time) {
   
   NA_FLAG <- FALSE
   ind.NA <- NULL
   ind.0 <- NULL
-  ind.excl <- NULL
-  ind.orig <- NULL
-  
-  ret.vec <- vec
+  # ind.excl <- NULL
+  # ind.orig <- NULL
   
   if (any(vec==0) | any(is.na(vec))) {
     NA_FLAG <- TRUE
     ind.NA <- which(is.na(vec))
     ind.0 <- which(vec==0)
-    ind.excl <- c(ind.NA, ind.0)
-    ind.keep <- setdiff(seq_along(vec), ind.excl)
-    vec <- vec[ind.keep]
+    # ind.excl <- c(ind.NA, ind.0)
+    # ind.keep <- setdiff(seq_along(vec), ind.excl)
+    vec <- spline(x = time, y = vec, xout = time)$y
+    # vec <- vec[ind.keep]
   }
   
   len.vec <- length(vec)
@@ -161,21 +160,94 @@ filter_w_padding <- function(bf, vec) {
   vec <- rev(vec)
   
   if (NA_FLAG) {
-    tmp.vec <- numeric(length = len.vec+length(ind.excl))
-    if (length(ind.NA) > 0) tmp.vec[ind.NA] <- NA
-    tmp.vec[ind.keep] <- vec
-    return(tmp.vec)
-  } else {
-    return(vec)
-  }
+    # tmp.vec <- numeric(length = len.vec+length(ind.excl))
+    if (length(ind.NA) > 0) vec[ind.NA] <- NA
+    if (length(ind.0) > 0) vec[ind.0] <- 0
+    # tmp.vec[ind.keep] <- vec
+    # return(tmp.vec)
+  } #else {
+  #   return(vec)
+  # }
+  
+  return(vec)
   
 }
 
+set_port_names <- function(variable.names, old.names) {
+  if (is.null(variable.names)) {
+    if (any(grepl("port", old.names))) {
+      return(old.names)
+    } 
+    if (any(old.names == "aux")) {
+      port.ind <- which(old.names == "aux")
+      old.names[port.ind] <- paste0("port", 1:length(port.ind))
+      return(old.names)
+    } 
+    stop("please use variable.names to specify which variables correspond to the port1, port2, etc.")
+  }
+  varnams <- names(variable.names)
+  if (any(grepl("port[1-9]+", varnams))) {
+    port.ind.vn <- which(grepl("port[1-9]+", varnams))
+    port.names <- as.character(unlist(variable.names))[port.ind.vn]
+    if (!all(port.names %in% old.names)) stop("at least some of the characters provided in variable.names for the ports do not match with the data")
+    port.ind <- which(old.names %in% port.names)
+    old.names[port.ind] <- varnams[port.ind.vn]
+    return(old.names)
+  }
+  if (any(grepl("port", old.names))) {
+    return(old.names)
+  } 
+  if (any(old.names == "aux")) {
+    port.ind <- which(old.names == "aux")
+    old.names[port.ind] <- paste0("port", 1:length(port.ind))
+    return(old.names)
+  } 
+  stop("please use variable.names to specify which variables correspond to the port1, port2, etc.")
+}
 
+set_time_name <- function(variable.names, old.names) {
+  if (is.null(variable.names)) {
+    if (any(grepl("time", old.names))) {
+      return(old.names)
+    } 
+    stop("please use variable.names to specify which variable corresponds to the time")
+  }
+  varnams <- names(variable.names)
+  if (any(grepl("time", varnams))) {
+    time.ind.vn <- which(grepl("time", varnams))[1]
+    time.name <- as.character(unlist(variable.names))[time.ind.vn]
+    if (!time.name %in% old.names) stop("the characters provided in variable.names for the time does not match with the data")
+    time.ind <- which(old.names %in% time.name)
+    old.names[time.ind] <- varnams[time.ind.vn]
+    return(old.names)
+  } 
+  if (any(grepl("time", old.names))) {
+    return(old.names)
+  } 
+  stop("please use variable.names to specify which variable corresponds to the port1, port2, etc.")
+}
 
-
-
-
-
-
-
+set_measure_names <- function(variable.names, old.names) {
+  patterns <- c("Fx", "Fy", "Fz", "Mx", "My", "Mz")
+  if (is.null(variable.names)) {
+    if (all(patterns %in% old.names)) {
+      return(old.names)
+    }
+    stop("please use variable.names to specify which variables correspond to Fx, Fy, Fz, Mx, My, and Mz")
+  }
+  if (all(patterns %in% c(varnams, old.names))) {
+    varnams.left <- names(variable.names)
+    varnams.right <- as.character(unlist(variable.names))
+    time.ind <- which(grepl("time", varnams.left))[1]
+    ports.ind <- which(grepl("port", varnams.left) | grepl("aux", varnams.left))
+    if (length(variable.names) == length(ports.ind, time.ind)) {
+      return(old.names)
+    }
+    measures.left <- varnams.left[-c(time.ind, ports.ind)]
+    measures.right <- varnams.right[-c(time.ind, ports.ind)]
+    measures.ind <- which(old.names %in% measures.right)
+    old.names[measures.ind] <- measures.left
+    return(old.names)
+  }
+  stop("please use variable.names to specify which variables correspond to the Fx, Fy, Fz, Mx, My, and Mz")
+}

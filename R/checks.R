@@ -41,6 +41,7 @@ check_interval <- function(x) {
 
 check_named_list_vectors <- function(x) {
   if (!is.list(x)) stop(paste0(deparse(substitute(x)), " must be a named list of numeric vectors/elements"))
+  if (is.null(names(x))) stop(paste0(deparse(substitute(x)), " must be a named list of numeric vectors/elements"))
   if (any(names(x)=="")) stop(paste0(deparse(substitute(x)), " must be a named list of numeric vectors/elements"))
   for (ind in 1:length(x)) {
     if (!is.numeric(x[[ind]])) stop(paste0(names(x)[ind], " of ", deparse(substitute(x)), " must be a numeric (vector)"))
@@ -50,12 +51,18 @@ check_named_list_vectors <- function(x) {
 check_potential_named_list_vectors <- function(x) {
   if (is.list(x)) {
     if (length(x) > 1) {
-      check_named_list_vectors(x)
+      if (!is.list(x)) stop(paste0(deparse(substitute(x)), " must be a named list of numeric vectors/elements"))
+      if (is.null(names(x))) stop(paste0(deparse(substitute(x)), " must be a named list of numeric vectors/elements"))
+      if (any(names(x)=="")) stop(paste0(deparse(substitute(x)), " must be a named list of numeric vectors/elements"))
+      for (ind in 1:length(x)) {
+        if (!is.numeric(x[[ind]])) stop(paste0(names(x)[ind], " of ", deparse(substitute(x)), " must be a numeric (vector)"))
+      }
     } else {
-      check_numeric_vector(x[[1]])
+      if (!is.numeric(x[[1]])) stop(paste0(deparse(substitute(x[[1]])), " must be numeric"))
     }
   } else {
-    check_numeric_vector(x)
+    if (!is.numeric(x)) stop(paste0(deparse(substitute(x)), " must be numeric"))
+    
   }
 }
 
@@ -67,7 +74,9 @@ check_data.table <- function(x) {
 check_list_of_OR_vector_of_interval <- function(x) {
   if (!is.vector(x)) stop(paste0(deparse(substitute(x)), " must be a (list of) vector(s) of length 2"))
   if (!is.list(x)) {
-    check_interval(x)
+    if (!is.numeric(x)) stop(paste0(deparse(substitute(x)), " must be a numeric vector of length 2"))
+    if (length(x) != 2) stop(paste0(deparse(substitute(x)), " must be a numeric vector of length 2"))
+    if (x[1] >= x[2]) stop(paste0(deparse(substitute(x)), " is not a valid interval"))
   } else if (is.list(x)) {
     for (ind in 1:length(x)) {
       if (!is.numeric(x[[ind]])) stop(paste0("element ", ind, " of ", deparse(substitute(x)), " must be a numeric vector of length 2"))
@@ -89,3 +98,21 @@ check_named_list_functions <- function(x) {
 check_character_in_colnames <- function(patterns, names) {
   if (any(!patterns %in% names)) stop(paste0("colnames must include subj, block, and trial"))
 }
+
+check_imputation <- function(x) {
+  if (!is.character(x)) stop(paste0(deparse(substitute(x)), " must be a (vector of) character(s)"))
+  if (!x %in% c("fmm", "periodic", "natural", "monoH.FC", "hyman")) stop(paste0(deparse(substitute(x)), " must be one of c(\"fmm\", \"periodic\", \"natural\", \"monoH.FC\", \"hyman\"). See: ?spline"))
+}
+
+check_variable_names <- function(x) {
+  if (!is.list(x)) stop(paste0(deparse(substitute(x)), " must be a named list of character elements"))
+  if (is.null(names(x))) stop(paste0(deparse(substitute(x)), " must be a named list of character elements"))
+}
+
+# check_variable_positions <- function(x) {
+#   necessary.names <- c("time", "Fx", "Fy", "Fz", "Mx", "My", "Mz")
+#   if (!is.list(x)) stop(paste0(deparse(substitute(x)), " must be a named list of numeric elements"))
+#   if (is.null(names(x))) stop(paste0(deparse(substitute(x)), " must be a named list of numeric elements"))
+#   if (any(!necessary.names %in% names(x))) stop(paste0(deparse(substitute(x)), " must at least contain ", necessary.names))
+#   if (!any(grepl("port[0-9]+", names(x)))) stop(paste0(deparse(substitute(x)), "must contain elements with the name \"post1\", \"post2\", \"post3\", ... with the indices for the parallel ports"))
+# }
