@@ -1,5 +1,5 @@
 
-#' @importFrom data.table fread ":=" rbindlist setorder
+#' @importFrom data.table ":=" fread rbindlist setattr setorder
 #' @importFrom stats complete.cases
 prep_exp_data <- function(filenames,
                           na.strings = c(",,", "[]", "None"),
@@ -62,7 +62,13 @@ prep_exp_data <- function(filenames,
 
   }
 
-  class(complete.experimental.dt) <- c(class(complete.experimental.dt), "exp.prepared")
-  return(complete.experimental.dt)
+  class(complete.experimental.dt) <- c(class(complete.experimental.dt), "exp.prep")
+  setattr(dt.final, "na.strings", na.strings)
+  setattr(dt.final, "excl.vars", excl.vars)
+  setattr(dt.final, "blacklist.vars", blacklist.vars)
+  setattr(dt.final, "whitelist.vars", whitelist.vars)
+  setattr(dt.final, "sorting", as.character(sort))
+  
+  return(copy(complete.experimental.dt))
 
 }

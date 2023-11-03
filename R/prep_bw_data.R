@@ -1,7 +1,7 @@
 
 # filenames must be of the form "xyzsubj<subjNR>block<blockNR>",
 #   where both
-#' @importFrom data.table fread ":=" rbindlist setorder copy setnames setcolorder
+#' @importFrom data.table ":=" copy fread rbindlist setattr setcolorder setnames setorder
 #' @importFrom signal butter
 #' @importFrom stringi stri_count_regex
 segment_fp_data <- function(filenames, n.trials,
@@ -14,8 +14,8 @@ segment_fp_data <- function(filenames, n.trials,
                             skip = 19, 
                             az0 = 0,
                             sampling.freq = 1000, cutoff.freq = 10,
-                            sort = TRUE,
                             imputation = NULL,
+                            sort = TRUE,
                             verbose = FALSE) {
   
   # CHECKS
@@ -106,13 +106,7 @@ segment_fp_data <- function(filenames, n.trials,
     tmp.dt <- fread(filenames[i], skip = skip, col.names = new.names) #, na.strings = na.strings)
     
     # CHECK TIME VARIABLE
-    if (any(!(1:(nrow(tmp.dt)-2))/sampling.freq %in% tmp.dt[[time.name]])) message(paste0(filenames[i], " might have missing values or your sampling.freq is not correctly set"))
-    if (any(is.na(tmp.dt[[time.name]]))) {
-      na.logic <- is.na(tmp.dt[[time.name]])
-      na.info <- rle(na.logic)
-      first.non.na <- which(!isTRUE(na.info$values) & na.info$lengths > 1)[1]
-      
-    }
+    correct_time_variable(filename[i], tmp.dt, sampling.freq, time.name)
     
     # IMPUTATION IF WANTED
     if (!is.null(imputation)) tmp.dt[, (measure.names) := lapply(.SD, function(x) spline(x = tmp.dt[[time.name]], y = x, xout = tmp.dt[[time.name]], method = imputation)$y), .SDcols = measure.names]
@@ -154,7 +148,7 @@ segment_fp_data <- function(filenames, n.trials,
     trial.info <- list(onset = event.info$onset[tmp.ind] - round(samp.factor*start.prepend))
     trial.info$offset <- c(tail(trial.info$onset-1, -1), nrow(tmp.dt))
     trial.ind <- vec_seq(trial.info$onset, trial.info$offset, 1)
-    bioware.dt[, forceplate := lapply(trial.ind, FUN = function(x) tmp.dt[x])]
+    bioware.dt[, forceplate := lapply(trial.ind, FUN = function(x) copy(tmp.dt[x,]))]
     
     event.start.ind <- c(which(event.info$values %in% start.trigger), length(event.info$values)+1)
     event.trial.intv <- lapply(1:(length(event.start.ind) - 1), function(i) {
@@ -179,7 +173,7 @@ segment_fp_data <- function(filenames, n.trials,
     # condition.info <- lapply(cond.trigger.list, FUN = function(x) {
     #   event.info$values[which(event.info$values %in% x)]
     # })
-    bioware.dt[, names(condition.info) := condition.info]
+    bioware.dt[, (names(condition.info)) := condition.info]
     
     # RESPONSE AND RESPONSE TIME
     response.info <- lapply(response.trigger.list, FUN = function(x) {
@@ -205,7 +199,7 @@ segment_fp_data <- function(filenames, n.trials,
           ind.resp <- which(event.trial.segm[[itrial]]$values %in% response.trigger.list[[x]])
           ind.stim <- which(event.trial.segm[[itrial]]$values %in% stimulus.trigger.list[[x]])
           if (length(ind.resp) > 1 | length(ind.stim) > 1) stop("some trials include more than one stimulus- or response-trigger of the same list element")
-          return(cumsum(event.trial.segm[[itrial]]$lengths[seq(ind.stim, ind.resp-1)])/samp.factor)
+          return(tail(cumsum(event.trial.segm[[itrial]]$lengths[seq(ind.stim, ind.resp-1)]), 1)/samp.factor)
         } else {
           return(NA)
         }
@@ -277,11 +271,12 @@ segment_fp_data <- function(filenames, n.trials,
       }
     }
     
+    # SAVE DATA.TABLE IN LARGE A LIST
+    list.bioware.dt[[i]] <- copy(bioware.dt)
+    rm("bioware.dt")
+    
     gc()
     setTxtProgressBar(pb, i)
-    
-    # SAVE DATA.TABLE IN LARGE A LIST
-    list.bioware.dt[[i]] <- bioware.dt
     
   }
   
@@ -290,12 +285,16 @@ segment_fp_data <- function(filenames, n.trials,
   
   # SAVE ALL IN ONE LARGE DATA.TABLE
   dt.final <- rbindlist(list.bioware.dt)
-  class(dt.final) <- c(class(dt.final), "fp.segmented")
-  attributes(dt.final) <- list(baseline.correction = ifelse(all(baseline.trigger==0), "FALSE", "TRUE"),
-                               center.of.pressure = ifelse(az0, "TRUE", "FALSE"),
-                               filter = ifelse(cutoff.freq, as.character(cutoff.freq), "FALSE"),
-                               sorting = as.character(sort),
-                               imputatation = ifelse(is.null(imputation), "FALSE", imputation))
+  class(dt.final) <- c(class(dt.final), "fp.segm")
+  
+  setattr(dt.final, "start.trigger", start.trigger)
+  setattr(dt.final, "sampling.freq", sampling.freq)
+  setattr(dt.final, "baseline.correction", ifelse(all(baseline.trigger==0), "FALSE", "TRUE"))
+  setattr(dt.final, "center.of.pressure", ifelse(az0, "TRUE", "FALSE"))
+  setattr(dt.final, "filter", ifelse(cutoff.freq, as.character(cutoff.freq), "FALSE"))
+  setattr(dt.final, "sorting", as.character(sort))
+  setattr(dt.final, "imputatation", ifelse(is.null(imputation), "FALSE", imputation))
+  
   return(dt.final)
   
 }

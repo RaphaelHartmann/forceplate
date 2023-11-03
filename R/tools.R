@@ -97,7 +97,7 @@ make_bins <- function(bins, bin.width = NULL, n.bins = NULL, sampling.freq = 100
     if (rest > 1) {
       warning(paste0("combination of n.bins and bins does not match exactly and leads to ", rest, " unused data points at the end of the interval"))
     }
-    cat(rest, "\n")
+    #cat(rest, "\n")
     bin.dp.bounds <- data.table(lower = seq(bins.dp[[1]][1], bins.dp[[1]][2]+1-bin.width.dp, by = bin.width.dp))
     bin.dp.bounds[, upper := lower + (bin.width.dp-1)]
     return(apply(bin.dp.bounds, 1, FUN = function(x) x, simplify = FALSE))
@@ -235,12 +235,18 @@ set_measure_names <- function(variable.names, old.names) {
     }
     stop("please use variable.names to specify which variables correspond to Fx, Fy, Fz, Mx, My, and Mz")
   }
+  varnams <- names(variable.names)
   if (all(patterns %in% c(varnams, old.names))) {
     varnams.left <- names(variable.names)
     varnams.right <- as.character(unlist(variable.names))
-    time.ind <- which(grepl("time", varnams.left))[1]
+    tmp.time.ind <- which(grepl("time", varnams.left))
+    if (length(tmp.time.ind) > 1) {
+      time.ind <- tmp.time.ind[1]
+    } else {
+      time.ind <- tmp.time.ind  
+    }
     ports.ind <- which(grepl("port", varnams.left) | grepl("aux", varnams.left))
-    if (length(variable.names) == length(ports.ind, time.ind)) {
+    if (length(variable.names) == length(ports.ind) + length(time.ind)) {
       return(old.names)
     }
     measures.left <- varnams.left[-c(time.ind, ports.ind)]
@@ -250,4 +256,18 @@ set_measure_names <- function(variable.names, old.names) {
     return(old.names)
   }
   stop("please use variable.names to specify which variables correspond to the Fx, Fy, Fz, Mx, My, and Mz")
+}
+
+correct_time_variable <- function(filename, dt, samp.freq, time.name) {
+  if (any(!(1:(nrow(dt)-2))/samp.freq %in% dt[[time.name]])) message(paste0(filenames, " might have missing values or your sampling.freq is not correctly set"))
+  if (any(is.na(dt[[time.name]]))) {
+    not.na.ind <- which(!is.na(dt[[time.name]]))[1:2]
+    dist <- (dt[[time.name]][not.na.ind[2]]-dt[[time.name]][not.na.ind[2]])/(not.na.ind[2]-not.na.ind[1])
+    start <- NULL
+    if (not.na.ind[1] != 1) {
+      start <- dt[[time.name]][not.na.ind[1]] - (not.na.ind[1]-1)*dist
+    } else start <- dt[[time.name]][not.na.ind[1]]
+    dt[, (time.name) := seq(from = start, by = dist, length.out = nrow(dt))]
+  }
+  return(0)
 }

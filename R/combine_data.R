@@ -9,6 +9,12 @@ combine_data <- function(dt1, dt2) {
   # CHECKS
   check_data.table(dt1)
   check_data.table(dt2)
+  if (!inherits(dt1, "exp.prep") & !inherits(dt1, "fp.segm")) stop("dt1 must be produced by segment_fp_data() or prep_exp_data()")
+  if (!inherits(dt2, "exp.prep") & !inherits(dt2, "fp.segm")) stop("dt2 must be produced by segment_fp_data() or prep_exp_data()")
+  dt1.copy <- copy(dt1)
+  dt2.copy <- copy(dt2)
+  if (inherits(dt1.copy, "fp.segm")) dt1.copy[, forceplate := lapply(forceplate, FUN = function(x) copy(x))]
+  if (inherits(dt2.copy, "fp.segm")) dt2.copy[, forceplate := lapply(forceplate, FUN = function(x) copy(x))]
   check_character_in_colnames(c("subj", "block", "trial"), col.names1)
   check_character_in_colnames(c("subj", "block", "trial"), col.names2)
     
