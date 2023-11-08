@@ -117,7 +117,7 @@ segment_fp_data <- function(filenames, n.trials,
     # COMPUTE SOME VARIABLES
     if (az0) tmp.dt[, CoPx:=(Fx*az0 - My*1000)/(Fz)]
     if (az0) tmp.dt[, CoPy:=(Fy*az0 + Mx*1000)/(Fz)]
-    if (az0) setcolorder(tmp.dt, measure.names.az0)
+    if (az0) setcolorder(tmp.dt, c(time.name, measure.names.az0))
     # tmp.dt[, Tz_new:=(Mz)*1000 - (Fy)*(CoPx) + (Fx)*(CoPy)]
     
     # CALCULATE EVENTS BY TRANSFORMATION OF PORT AND BYTE TO DECIMAL
@@ -146,7 +146,7 @@ segment_fp_data <- function(filenames, n.trials,
     if (length(tmp.ind) != num.trials) stop(paste0("the current dataset should have ", num.trials, " trials, 
                                                    but start.trigger appears in ", length(tmp.ind)))
     trial.info <- list(onset = event.info$onset[tmp.ind] - round(samp.factor*start.prepend))
-    trial.info$offset <- c(tail(trial.info$onset-1, -1), nrow(tmp.dt))
+    trial.info$offset <- c(tail(trial.info$onset+round(samp.factor*start.prepend)-1, -1), nrow(tmp.dt))
     trial.ind <- vec_seq(trial.info$onset, trial.info$offset, 1)
     bioware.dt[, forceplate := lapply(trial.ind, FUN = function(x) copy(tmp.dt[x,]))]
     
@@ -285,7 +285,7 @@ segment_fp_data <- function(filenames, n.trials,
   
   # SAVE ALL IN ONE LARGE DATA.TABLE
   dt.final <- rbindlist(list.bioware.dt)
-  class(dt.final) <- c(class(dt.final), "fp.segm")
+  setattr(dt.final, "class", c("fp.segm", class(dt.final)))
   
   setattr(dt.final, "start.trigger", start.trigger)
   setattr(dt.final, "sampling.freq", sampling.freq)

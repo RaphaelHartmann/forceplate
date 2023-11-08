@@ -62,12 +62,13 @@ prep_exp_data <- function(filenames,
 
   }
 
-  class(complete.experimental.dt) <- c(class(complete.experimental.dt), "exp.prep")
-  setattr(dt.final, "na.strings", na.strings)
-  setattr(dt.final, "excl.vars", excl.vars)
-  setattr(dt.final, "blacklist.vars", blacklist.vars)
-  setattr(dt.final, "whitelist.vars", whitelist.vars)
-  setattr(dt.final, "sorting", as.character(sort))
+  setattr(complete.experimental.dt, "class", c("exp.prep", class(complete.experimental.dt)))
+  
+  setattr(complete.experimental.dt, "na.strings", na.strings)
+  setattr(complete.experimental.dt, "excl.vars", excl.vars)
+  setattr(complete.experimental.dt, "blacklist.vars", blacklist.vars)
+  setattr(complete.experimental.dt, "whitelist.vars", whitelist.vars)
+  setattr(complete.experimental.dt, "sorting", as.character(sort))
   
   return(copy(complete.experimental.dt))
 

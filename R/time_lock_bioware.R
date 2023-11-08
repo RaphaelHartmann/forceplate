@@ -111,7 +111,7 @@ time_lock_fp_data <- function(fp.dt, vars,
   gc()
 
   # SAVE AS LARGE DATA.TABLE
-  class(fp.dt.copy) <- c(class(fp.dt.copy), "fp.tl")
+  setattr(fp.dt.copy, "class", c("fp.tl", class(fp.dt.copy)))
   setattr(fp.dt.copy, "bins", paste0(paste0(1:length(bins.dp), ". ", as.character(bins.dp)), collapse = " ; "))
   return(fp.dt.copy)
 
