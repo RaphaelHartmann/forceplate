@@ -25,31 +25,65 @@ segment_fp_data(
 )
 }
 \arguments{
-\item{filenames}{A vector of characters providing the file names.}
+\item{filenames}{A (vector of) character(s) providing the file name(s).}
 
-\item{n.trials}{...}
+\item{n.trials}{A (vector of) number(s) providing the number of trial (per filename).}
 
-\item{start.trigger}{...}
+\item{start.trigger}{A (vector of) number(s) providing the trigger(s) marking the beginning of a trial.}
 
-\item{stimulus.trigger.list}{...}
+\item{baseline.trigger}{A (vector of) number(s) providing the trigger number(s) providing the reference for
+the intervall for the baseline correction. For example, if set to 1 the onset of event with trigger 1 is
+used as zero point for the next argument (\code{baseline.intv}). Use 0 to indicate that you wish to use no
+baseline correction.}
 
-\item{response.trigger.list}{...}
+\item{baseline.intv}{A vector of length 2 providing the lower and upper bounds of the interval that will
+be used as baseline interval. For each measurement variable the mean of the data points that fall into this
+interval will subtracted from all data points within a trial.}
 
-\item{cond.trigger.list}{...}
+\item{stimulus.trigger.list}{If a trial contains one task only, then a vector providing the trigger(s)
+marking the onset of the stimulus. If a trial contains more than one task, then a named list of vectors
+providing the trigger(s) marking the onset of stimuli. For example,
+\code{auditory = c(2,3,4,5), visual = c(8, 9)}.}
 
-\item{variable.names}{...}
+\item{response.trigger.list}{Same as \code{stimulus.trigger.list} but with trigger(s) marking the onset
+of responses. For example, \code{auditory = c(16,17), visual = c(32,33)}.}
 
-\item{skip}{...}
+\item{cond.trigger.list}{A named list of vectors providing the trigger(s) marking the conditions.}
 
-\item{az0}{...}
+\item{variable.names}{If used, a named list of names. This will rename the variables of the force-plate data.
+There are three cases to consider:
+\itemize{
+\item the time variable: if your force-plate data does not contain a variable with the string "time" in it
+or you want to rename the time variable in the force-plate data you can specify
+\code{time = "fp_time_name"} in the \code{variable.names} list. The left hand side must be an expression
+that contains the string "time". The right hand side must be the actual variable name in your raw force-plate data
+you want to replace.
+\item the parallel port variable: if your force-plate data does not contain variables with the string "port" in it
+or you want to rename the port variables in the force-plate data you can specify
+\code{port1 = "fp_port1_name"}, \code{port2 = "fp_port2_name"}, \code{port3 = "fp_port3_name"}, and so on, in the
+\code{variable.names} list. The left hand side must be the string "port" followed by a number. The right hand side
+must be the actual variable name in the force-plate data you want to replace.
+\item measurement variables: if you wish to rename some measurement variables in your force-plate data you can do so
+with the only restriction being that the right hand side does not contain the strings "time" nor "port". For example
+\code{y_Force = "Fy"} is allowed. But we recommend sticking with the six basic measurement variable names
+"Fx", "Fy", "Fz", "Mx", "My", and "Mz".
+}}
 
-\item{sampling.freq}{...}
+\item{skip}{A number giving the number of lines in the raw force-plate data to skip. In BioWare this is 19. The real data
+starts at line 20. Therefore the default value is set to 19.}
 
-\item{cutoff.freq}{...}
+\item{az0}{??????????????}
 
-\item{imputation}{...}
+\item{sampling.freq}{A number giving the sampling frequency. Typically 1000 Hz.}
 
-\item{sort}{...}
+\item{cutoff.freq}{A number giving the cut-off frequency used for the low-pass filter. If set to 0, no low-pass filter
+will be applied.}
+
+\item{imputation}{If you expect any NaNs in your raw force-plate data you might use this argument. Use either of the
+following options: "fmm", "periodic", "natural", "monoH.FC", or "hyman". These are method options in the
+\code{stats::spline()} function. Usually this option is not needed.}
+
+\item{sort}{TRUE or FALSE. If TRUE the data will be sorted by subject number and block number.}
 }
 \value{
 A \code{data.table} of the class \code{fp.segm}.
@@ -73,6 +107,8 @@ Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Cod
 Johannsen, L., Stephan, D. N., Straub, E., Döhring, F., Kiesel, A., Koch, I., & Müller, H. (2023). Assessing the influence of cognitive response conflict on balance control: An
 event-related approach using response-aligned force-plate time series data.
 \emph{Psychological Research, 87}, 2297–2315.
+
+Winter, D. A. (2009). \emph{Biomechanics and Motor Control of Human Movement}.
 }
 \author{
 Raphael Hartmann & Anton Koger
