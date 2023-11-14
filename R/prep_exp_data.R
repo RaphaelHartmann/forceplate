@@ -1,4 +1,23 @@
 
+#' Prepare Experimental Data
+#' 
+#' Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
+#'   \code{myvariable} geschrieben werden.
+#'
+#' @param filenames A (vector of) character(s) providing the raw experimental data file name(s)..
+#' @param na.strings A (vector of) character(s) naming the strings that should be treated as NA.
+#' @param excl.vars A (vector of) number(s) or character(s) providing the column number(s) or name(s) 
+#'   of the data which will be used for spotting rows that are not trials, that is, rows that are
+#'   NA in each of the columns \code{excl.vars}.
+#' @param blacklist.vars A (vector of) character(s) providing the name(s) of variables to be deleted
+#'   from the data. NULL means no variable will be deleted.
+#' @param whitelist.vars A (vector of) character(s) providing the name(s) of variables to be kept
+#'   in the data. All others will be deleted. NULL means all variables will be kept.
+#' @param sort TRUE or FALSE. If TRUE the data will be sorted by subject number and block number.
+#' @return A \code{data.table} of the class \code{exp.prep}.
+#' @examples 
+#' # prep_exp_data()
+#' @author Raphael Hartmann & Anton Koger
 #' @importFrom data.table ":=" fread rbindlist setattr setorder
 #' @importFrom stats complete.cases
 prep_exp_data <- function(filenames,

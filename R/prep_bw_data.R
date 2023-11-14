@@ -4,9 +4,12 @@
 #' Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
 #'   \code{myvariable} geschrieben werden.
 #'
-#' @param filenames A (vector of) character(s) providing the file name(s).
+#' @param filenames A (vector of) character(s) providing the raw force-plate file name(s).
 #' @param n.trials A (vector of) number(s) providing the number of trial (per filename).
 #' @param start.trigger A (vector of) number(s) providing the trigger(s) marking the beginning of a trial.
+#' @param start.prepend A number giving the number of milliseconds to prepend before the \code{start.trigger}.
+#'   If this is not 0 then each trial will have additional \code{start.prepend} milliseconds added at the
+#'   beginning of each trial.
 #' @param stimulus.trigger.list If a trial contains one task only, then a vector providing the trigger(s) 
 #'   marking the onset of the stimulus. If a trial contains more than one task, then a named list of vectors
 #'   providing the trigger(s) marking the onset of stimuli. For example, 
@@ -18,11 +21,11 @@
 #'   used as zero point for the next argument (\code{baseline.intv}). Use 0 to indicate that you wish to use no
 #'   baseline correction.
 #' @param baseline.intv A vector of length 2 providing the lower and upper bounds of the interval that will
-#'   be used as baseline interval. For each measurement variable the mean of the data points that fall into this
-#'   interval will subtracted from all data points within a trial.
+#'   be used as baseline interval (in milliseconds). For each measurement variable the mean of the data points 
+#'   that fall into this interval will subtracted from all data points within a trial.
 #' @param cond.trigger.list A named list of vectors providing the trigger(s) marking the conditions.
-#' @param variable.names If used, a named list of names. This will rename the variables of the force-plate data. 
-#'   There are three cases to consider:
+#' @param variable.names If used (i.e., not NULL), a named list of names. This will rename the variables of the 
+#'   force-plate data. There are three cases to consider:
 #'   \itemize{
 #'     \item the time variable: if your force-plate data does not contain a variable with the string "time" in it
 #'       or you want to rename the time variable in the force-plate data you can specify 
@@ -43,11 +46,11 @@
 #'   starts at line 20. Therefore the default value is set to 19.
 #' @param az0 ??????????????
 #' @param sampling.freq A number giving the sampling frequency. Typically 1000 Hz.
-#' @param cutoff.freq A number giving the cut-off frequency used for the low-pass filter. If set to 0, no low-pass filter
-#'   will be applied.
+#' @param cutoff.freq A number giving the cut-off frequency used for the low-pass 4th order Butterworth filter. If set to 0, 
+#'   no low-pass filter will be applied.
 #' @param imputation If you expect any NaNs in your raw force-plate data you might use this argument. Use either of the 
 #'   following options: "fmm", "periodic", "natural", "monoH.FC", or "hyman". These are method options in the 
-#'   \code{stats::spline()} function. Usually this option is not needed.
+#'   \code{stats::spline()} function. Usually this option is not needed and the default (NULL) can be used.
 #' @param sort TRUE or FALSE. If TRUE the data will be sorted by subject number and block number.
 #' @return A \code{data.table} of the class \code{fp.segm}.
 #'   The following variables are included in the \code{data.table}: 

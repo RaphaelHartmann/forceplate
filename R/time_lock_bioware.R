@@ -1,4 +1,45 @@
 
+#' Calculate Statistics for Time Locked Bins
+#' 
+#' Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
+#'   \code{myvariable} geschrieben werden.
+#'
+#' @param fp.dt A \code{data.table} of the class \code{"fp.segm"} produced by \code{segment_fp_data()}.
+#' @param vars A (vector of) character(s) giving the variable names in \code{fp.dt$forceplate}, for
+#'   which the statistics (see \code{FUN} below) should be calculated for each bin (see arguments below).
+#' @param time.lock.trigger A (vector of) number(s) containing the trigger(s) marking the onset of the
+#'   time locking. The onset of this trigger will be treated as reference (point zero) for the bins to
+#'   be defined in the next argument(s).
+#' @param bins Either a vector of length 2 or a list of vectors of length 2 providing the lower and
+#'   upper boundaries of the bins (in milliseconds). If only one vector is used either one of the next
+#'   two arguments can be used to make (equaly sized) bins. If a list is used the next two arguments 
+#'   are ignored.
+#' @param bin.width If \code{bins} is a vector of 2 then this argument can be used to divide the bin
+#'   into smaller bins of the size \code{bin.width} in milliseconds.
+#' @param n.bins If \code{bins} is a vector of 2 then this argument can be used to divide the bin into
+#'   \code{n.bins} number of bins of equal size. If \code{bin.width} is provided as well, \code{n.bins}
+#'   will be ignored.
+#' @param FUN A list of functions. These functions should be statistics that take as input a vector and
+#'   return a scalar. See usage for an example (mean, standard deviation, range).
+#' @return A \code{data.table} of the class \code{fp.tl}.
+#'   The following variables are included in the \code{data.table}: 
+#'   \itemize{
+#'     \item \code{subj}: subject number,
+#'     \item \code{block}: block number,
+#'     \item \code{trial}: trial number,
+#'     \item \code{forceplate}: force-plate data of each trial as \code{data.table}. Use, for example, 
+#'       \code{fp.dt$forceplate[[1]]} to open the force-plate data of the first trial, first block, and first subject
+#'     \item for each combination of variable \code{vars} and bin a new variable is created by the function provided
+#'       by \code{FUN}.
+#'   }
+#' @references
+#' Johannsen, L., Stephan, D. N., Straub, E., Döhring, F., Kiesel, A., Koch, I., & Müller, H. (2023). Assessing the influence of cognitive response conflict on balance control: An
+#'   event-related approach using response-aligned force-plate time series data. 
+#'   \emph{Psychological Research, 87}, 2297–2315. 
+#' @examples 
+#' # time_lock_fp_data()
+#' @author Raphael Hartmann & Anton Koger
+#' @export
 #' @importFrom data.table ":=" copy setattr setnames
 time_lock_fp_data <- function(fp.dt, vars,
                               time.lock.trigger,
