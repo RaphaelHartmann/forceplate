@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^data$
 ^shell\.nix$
+^_libs$
