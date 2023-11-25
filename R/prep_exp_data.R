@@ -1,8 +1,8 @@
 
 #' Prepare Experimental Data
 #' 
-#' Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
-#'   \code{myvariable} geschrieben werden.
+#' Processing the experimental data by removing unnecessary variables and removing rows in the data
+#'   that are not trials. The output is a \code{data.table}.
 #'
 #' @param filenames A (vector of) character(s) providing the raw experimental data file name(s)..
 #' @param na.strings A (vector of) character(s) naming the strings that should be treated as NA.

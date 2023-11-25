@@ -1,4 +1,13 @@
 
+#' Combine Two Data Tables
+#' 
+#' Combine two \code{data.table}s, either two force-plate data, two exeperimental data, or one force-plate and one experimental data.
+#' 
+#' @param dt1 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}
+#' @param dt2 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}
+#' @return A \code{data.table} of the same class as \code{dt1} and \code{dt2} (if they have the same class) or of the class \code{dt.comb}.
+#' @author Raphael Hartmann & Anton Koger
+#' @export
 #' @importFrom data.table setcolorder rbindlist fintersect
 combine_data <- function(dt1, dt2) {
   
