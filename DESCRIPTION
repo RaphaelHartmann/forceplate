@@ -1,11 +1,12 @@
 Package: forceplate
-Title: Preprocessing Force Plate BioWare Data
+Title: Preprocessing Force-Plate Data
 Version: 0.0.0.9000
 Authors@R: 
     c(person("Raphae", "Hartmann", , "raphael.hartmann@protonmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4686-9329")),
       person("Anton", "Koger", , "anton.koger@psych.rwth-aachen.de", role = c("aut", "ctb"), comment = c(ORCID = "0009-0004-6906-5184")),
       person("Leif", "Johannsen", , "leif.johannsen@psych.rwth-aachen.de", role = c("ctb")))
-Description: What the package does (one paragraph).
+Description: Process force-plate data. This includes segmenting force-plate data into trials, remove artifacts, label events in each trial,
+    calculating descriptive statistics, and much more.
 Imports: data.table, signal, stats
 License: GPL (>= 2)
 Encoding: UTF-8
