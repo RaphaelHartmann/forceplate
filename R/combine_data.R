@@ -1,11 +1,16 @@
 
-#' Combine Two Data Tables
+#' Combine Data Tables
 #' 
-#' Combine two \code{data.table}s, either two force-plate data, two exeperimental data, or one force-plate and one experimental data.
-#' 
-#' @param dt1 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}
-#' @param dt2 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}
-#' @return A \code{data.table} of the same class as \code{dt1} and \code{dt2} (if they have the same class) or of the class \code{dt.comb}.
+#' Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
+#'   \code{myvariable} geschrieben werden.
+#'
+#' @param dt1 A data.table of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}.
+#' @param dt2 A data.table of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}. Make
+#'   sure the two data.table have either the same number of rows or the same columns.
+#' @return A \code{data.table} either of the same class as the \code{dt1} and \code{dt2}, if they
+#'   share the same class, or of the class \code{dt.comb}.
+#' @examples 
+#' # combine_data()
 #' @author Raphael Hartmann & Anton Koger
 #' @export
 #' @importFrom data.table setcolorder rbindlist fintersect
@@ -30,14 +35,23 @@ combine_data <- function(dt1, dt2) {
   if (length(col.names1) == length(col.names2) & all(sort(col.names1)==sort(col.names2))) { # append
     
     if (order(col.names1) != order(col.names2)) {
-      setcolorder(dt2, col.names1)
+      setcolorder(dt2.copy, col.names1)
     }
-    return(rbindlist(list(dt1, dt2)))
+    dt.fin <- copy(rbindlist(list(dt1.copy, dt2.copy)))
+    if (inherits(dt.fin, "fp.segm")) {
+      dt.fin[, forceplate := lapply(forceplate, FUN = function(x) copy(x))]
+    }
+    return(dt.fin)
     
-  } else if (nrow(dt1) == nrow(dt2)) { # merge
+  } else if (nrow(dt1.copy) == nrow(dt2.copy)) { # merge
     
-    if (nrow(fintersect(dt1[, .SD, .SDcols = c("subj", "block", "trial")], dt2[, .SD, .SDcols = c("subj", "block", "trial")])) == nrow(dt1)) {
-      return(merge(dt2, dt1, by = c("subj", "block", "trial")))
+    if (nrow(fintersect(dt1.copy[, .SD, .SDcols = c("subj", "block", "trial")], dt2.copy[, .SD, .SDcols = c("subj", "block", "trial")])) == nrow(dt1.copy)) {
+      dt.fin <- copy(merge(dt2.copy, dt1.copy, by = c("subj", "block", "trial")))
+      if (inherits(dt.fin, "fp.segm")) {
+        dt.fin[, forceplate := lapply(forceplate, FUN = function(x) copy(x))]
+        setattr(dt.fin, "class", c("dt.comb", class(dt.fin)))
+      }
+      return(dt.fin)
     }
     
   } else {
