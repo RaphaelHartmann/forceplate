@@ -81,7 +81,7 @@ starts at line 20. Therefore the default value is set to 19.}
 \item{sampling.freq}{A number giving the sampling frequency. Typically 1000 Hz.}
 
 \item{cutoff.freq}{A number giving the cut-off frequency used for the low-pass 4th order Butterworth filter. If set to 0,
-no low-pass filter will be applied.}
+no low-pass filter will be applied. Default is 10 Hz.}
 
 \item{imputation}{If you expect any NaNs in your raw force-plate data you might use this argument. Use either of the
 following options: "fmm", "periodic", "natural", "monoH.FC", or "hyman". These are method options in the
