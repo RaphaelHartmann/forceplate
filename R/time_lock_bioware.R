@@ -72,6 +72,12 @@ time_lock_fp_data <- function(fp.dt, vars,
   for (i in 1:n.rows.bwdt) {
     event.info <- event_transcription(dt = fp.dt.copy$forceplate[[i]], correction = FALSE)
     tmp.ind <- which(event.info$values %in% time.lock.trigger)
+    if (length(tmp.ind) > 1) {
+      message(paste0("found more than one time-lock trigger in trial ", fp.dt.copy$trial[i], 
+                     " block ", fp.dt.copy$block[i], " subj ", fp.dt.copy$subj[i], 
+                     "\nOnly the first one is used! Please make sure this makes sense\n"))
+      tmp.ind <- tmp.ind[1]
+    }
     if (length(tmp.ind) > 0) {
       n.dp <- sum(event.info$lengths)
       if (tail((cumsum(event.info$lengths[1:(tmp.ind-1)])), 1) < abs(min(unlist(bins.dp)))) stop("bins out of bounds! At least one of the lower bounds of bins is too small")
@@ -109,13 +115,7 @@ time_lock_fp_data <- function(fp.dt, vars,
           event.info$values[1] <- 0 # ... then make it 0 (artifact from last experiment)
         }
       }
-      tmp.ind <- which(event.info$values %in% time.lock.trigger)
-      if (length(tmp.ind) > 1) {
-        message(paste0("found more than one time-lock trigger in trial ", fp.dt.copy$trial[i], 
-                       " block ", fp.dt.copy$block[i], " subj ", fp.dt.copy$subj[i], 
-                       "\nOnly the first one is used! Please make sure this makes sense\n"))
-        tmp.ind <- tmp.ind[1]
-      }
+      tmp.ind <- which(event.info$values %in% time.lock.trigger)[1]
       lock.info <- list(zero = event.info$onset[tmp.ind])
       lock.info$lower <- sapply(bins.dp, function(x) lock.info$zero + x[1])
       lock.info$upper <- sapply(bins.dp, function(x) lock.info$zero + x[2])
