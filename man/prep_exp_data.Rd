@@ -22,11 +22,11 @@ prep_exp_data(
 of the data which will be used for spotting rows that are not trials, that is, rows that are
 NA in each of the columns \code{excl.vars}.}
 
-\item{blacklist.vars}{A (vector of) character(s) providing the name(s) of variables to be deleted
-from the data. NULL means no variable will be deleted.}
+\item{blacklist.vars}{A (vector of) number(s) or character(s) providing the column number(s) or name(s)
+of variables to be deleted from the data. NULL means no variable will be deleted.}
 
-\item{whitelist.vars}{A (vector of) character(s) providing the name(s) of variables to be kept
-in the data. All others will be deleted. NULL means all variables will be kept.}
+\item{whitelist.vars}{A (vector of) number(s) or character(s) providing the column number(s) or name(s)
+of variables to be kept in the data. All others will be deleted. NULL means all variables will be kept.}
 
 \item{sort}{TRUE or FALSE. If TRUE the data will be sorted by subject number and block number.}
 }
@@ -38,7 +38,13 @@ Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Cod
 \code{myvariable} geschrieben werden.
 }
 \examples{
-# prep_exp_data()
+# Using example data from github
+filenames <- tempfile(pattern = c("subj099_"), tmpdir = tempdir(), fileext = ".csv")
+
+download.file(url = "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv", filenames)
+
+exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
+                         
 }
 \author{
 Raphael Hartmann & Anton Koger

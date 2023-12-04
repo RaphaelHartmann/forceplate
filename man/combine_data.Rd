@@ -20,9 +20,6 @@ share the same class, or of the class \code{dt.comb}.
 Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
 \code{myvariable} geschrieben werden.
 }
-\examples{
-# combine_data()
-}
 \author{
 Raphael Hartmann & Anton Koger
 }
