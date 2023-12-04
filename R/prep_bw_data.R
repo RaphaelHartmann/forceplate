@@ -44,7 +44,7 @@
 #'   }
 #' @param skip A number giving the number of lines in the raw force-plate data to skip. In BioWare this is 19. The real data
 #'   starts at line 20. Therefore the default value is set to 19.
-#' @param az0 ??????????????
+#' @param az0 Negative displacement in millimeters. Also referred to as thickness parameter of the force plate.
 #' @param sampling.freq A number giving the sampling frequency. Typically 1000 Hz.
 #' @param cutoff.freq A number giving the cut-off frequency used for the low-pass 4th order Butterworth filter. If set to 0, 
 #'   no low-pass filter will be applied. Default is 10 Hz.
@@ -142,6 +142,7 @@ segment_fp_data <- function(filenames, n.trials,
   check_numeric_element(skip)
   if (skip < 1) stop("skip must be larger than 0")
   check_numeric_element(az0)
+  if (az0 < 0) stop("az0 must be negative")
   check_logical_element(sort)
   if (!is.null(imputation)) check_imputation(imputation)
   check_numeric_element(sampling.freq)
