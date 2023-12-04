@@ -9,8 +9,6 @@
 #'   sure the two data.table have either the same number of rows or the same columns.
 #' @return A \code{data.table} either of the same class as the \code{dt1} and \code{dt2}, if they
 #'   share the same class, or of the class \code{dt.comb}.
-#' @examples 
-#' # combine_data()
 #' @author Raphael Hartmann & Anton Koger
 #' @export
 #' @importFrom data.table setcolorder rbindlist fintersect

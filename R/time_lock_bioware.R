@@ -37,7 +37,22 @@
 #'   event-related approach using response-aligned force-plate time series data. 
 #'   \emph{Psychological Research, 87}, 2297–2315. 
 #' @examples 
-#' # time_lock_fp_data()
+#' # Using example data from github
+#' filenames <- tempfile(pattern = c("subj099_block001_", "subj099_block002_"), tmpdir = tempdir(), fileext = ".txt")
+#' 
+#' download.file(url = c("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block001.txt",
+#'                       "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block002.txt"), filenames)
+#' 
+#' fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
+#'                          baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
+#'                          stimulus.trigger.list = c(2, 4, 8, 16),
+#'                          response.trigger.list = c(32,64),
+#'                          cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+#'                          
+#' # Response-locking with 2 bins before and 2 bins after response onset. Each bin is 100 ms.
+#' tl.dt <- time_lock_fp_data(fp.dt = fp.dt, vars = c("Mx", "My"), time.lock.trigger = c(32, 64), bins = c(-200, 200),
+#'                            n.bins = 4, FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))))
+#' 
 #' @author Raphael Hartmann & Anton Koger
 #' @export
 #' @importFrom data.table ":=" copy setattr setnames

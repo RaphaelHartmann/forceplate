@@ -78,7 +78,7 @@
 #'                          baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
 #'                          stimulus.trigger.list = c(2, 4, 8, 16),
 #'                          response.trigger.list = c(32,64),
-#'                          cond.trigger.list = list(location_compat = c(2, 4, 8, 16))
+#'                          cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
 #' 
 #' @author Raphael Hartmann & Anton Koger
 #' @export
