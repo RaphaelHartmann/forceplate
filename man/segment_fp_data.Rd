@@ -20,8 +20,7 @@ segment_fp_data(
   sampling.freq = 1000,
   cutoff.freq = 10,
   imputation = NULL,
-  sort = TRUE,
-  verbose = FALSE
+  sort = TRUE
 )
 }
 \arguments{
@@ -105,17 +104,32 @@ Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Cod
 \code{myvariable} geschrieben werden.
 }
 \examples{
-# Using example data from github
-filenames <- tempfile(pattern = c("subj099_block001_", "subj099_block002_"), tmpdir = tempdir(), fileext = ".txt")
-
-download.file(url = c("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block001.txt",
-                      "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block002.txt"), filenames)
-
-fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
-                         baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
-                         stimulus.trigger.list = c(2, 4, 8, 16),
-                         response.trigger.list = c(32,64),
-                         cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+# Using example data from github which requires internet
+\dontrun{
+if (curl::has_internet()) {
+  url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
+                "main/data/subj099_block001.txt")
+  
+  # Safe download, handling potential errors
+  tryCatch({
+    filenames <- tempfile(pattern = c("subj099_block001_"), 
+                          tmpdir = tempdir(), fileext = ".txt")
+    download.file(url, filenames)
+    
+    # segment raw text file from Bioware
+    fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
+                             baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
+                             stimulus.trigger.list = c(2, 4, 8, 16),
+                             response.trigger.list = c(32,64),
+                             cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+    
+    # Clean up
+    unlink(temp_file)
+  }, error = function(e) {
+    message("Failed to download data: ", e$message)
+  })
+}
+}
 
 }
 \references{

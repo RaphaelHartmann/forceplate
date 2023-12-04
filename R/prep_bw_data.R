@@ -68,17 +68,32 @@
 #'   
 #' Winter, D. A. (2009). \emph{Biomechanics and Motor Control of Human Movement}.
 #' @examples 
-#' # Using example data from github
-#' filenames <- tempfile(pattern = c("subj099_block001_", "subj099_block002_"), tmpdir = tempdir(), fileext = ".txt")
-#' 
-#' download.file(url = c("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block001.txt",
-#'                       "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block002.txt"), filenames)
-#' 
-#' fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
-#'                          baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
-#'                          stimulus.trigger.list = c(2, 4, 8, 16),
-#'                          response.trigger.list = c(32,64),
-#'                          cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+#' # Using example data from github which requires internet
+#' \dontrun{
+#' if (curl::has_internet()) {
+#'   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
+#'                 "main/data/subj099_block001.txt")
+#'   
+#'   # Safe download, handling potential errors
+#'   tryCatch({
+#'     filenames <- tempfile(pattern = c("subj099_block001_"), 
+#'                           tmpdir = tempdir(), fileext = ".txt")
+#'     download.file(url, filenames)
+#'     
+#'     # segment raw text file from Bioware
+#'     fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
+#'                              baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
+#'                              stimulus.trigger.list = c(2, 4, 8, 16),
+#'                              response.trigger.list = c(32,64),
+#'                              cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+#'     
+#'     # Clean up
+#'     unlink(temp_file)
+#'   }, error = function(e) {
+#'     message("Failed to download data: ", e$message)
+#'   })
+#' }
+#' }
 #' 
 #' @author Raphael Hartmann & Anton Koger
 #' @export
@@ -96,8 +111,12 @@ segment_fp_data <- function(filenames, n.trials,
                             az0 = 0,
                             sampling.freq = 1000, cutoff.freq = 10,
                             imputation = NULL,
-                            sort = TRUE,
-                            verbose = FALSE) {
+                            sort = TRUE) {
+  
+  verbose = FALSE
+  
+  # FOR USE WITH DATA.TABLE IN PACKAGES
+  forceplate <- subjNR <- blockNR <- CoPx <- CoPy <- Fx <- Fy <- Fz <- Mx <- My <- Mz <- events <- response <- rt <- dCoPx <- dCoPy <- NULL
   
   # CHECKS
   check_character_vector(filenames)
@@ -146,7 +165,7 @@ segment_fp_data <- function(filenames, n.trials,
   }
   
   # PREPARE PROGRESS BAR
-  pb <- txtProgressBar(style = 3, min = 0, max = length.fn, width = 50)
+  pb <- utils::txtProgressBar(style = 3, min = 0, max = length.fn, width = 50)
   
   # VARIABLE MAPPING
   tmp.new.names <- NULL
@@ -155,7 +174,7 @@ segment_fp_data <- function(filenames, n.trials,
   pattern_regex <- paste(patterns, collapse = "|")
   lines <- readLines(filenames[1], n = skip)
   counts <- stri_count_regex(lines, pattern_regex)
-  old.names <- strsplit(lines[tail(which.max(counts), 1)], "\t")[[1]]
+  old.names <- strsplit(lines[utils::tail(which.max(counts), 1)], "\t")[[1]]
   if (!is.null(variable.names)) {
     if (any(!as.character(unlist(variable.names)) %in% old.names)) stop("make sure all names in variable.names are in the data as well")
   }
@@ -187,10 +206,10 @@ segment_fp_data <- function(filenames, n.trials,
     tmp.dt <- fread(filenames[i], skip = skip, col.names = new.names) #, na.strings = na.strings)
     
     # CHECK TIME VARIABLE
-    correct_time_variable(filename[i], tmp.dt, sampling.freq, time.name)
+    correct_time_variable(filenames[i], tmp.dt, sampling.freq, time.name)
     
     # IMPUTATION IF WANTED
-    if (!is.null(imputation)) tmp.dt[, (measure.names) := lapply(.SD, function(x) spline(x = tmp.dt[[time.name]], y = x, xout = tmp.dt[[time.name]], method = imputation)$y), .SDcols = measure.names]
+    if (!is.null(imputation)) tmp.dt[, (measure.names) := lapply(.SD, function(x) stats::spline(x = tmp.dt[[time.name]], y = x, xout = tmp.dt[[time.name]], method = imputation)$y), .SDcols = measure.names]
     
     # LOW-PASS FILTER (BUTTERWORTH 4TH ORDER)
     if (cutoff.freq) tmp.dt[, (measure.names) := lapply(.SD, function(x) filter_w_padding(bf, x, tmp.dt[[time.name]])), .SDcols = measure.names]
@@ -211,7 +230,7 @@ segment_fp_data <- function(filenames, n.trials,
     # CREATE DATA.TABLE FOR THE CURRENT BLOCK
     bioware.dt <- data.table(subj = fn.info$subjNR[i], block = fn.info$blockNR[i],
                              trial = 1:num.trials, forceplate = list())
-    bioware.dt[, c(cond.names) := .(NA)]
+    bioware.dt[, c(cond.names) := list(NA)] # .(NA)
     bioware.dt <- copy(bioware.dt[, c(1:3, 4+(1:length(cond.names)), 4), with = FALSE])
     
     # CREATE ON- AND OFFSETS FOR EACH TRIGGER AND CLEAN
@@ -227,7 +246,7 @@ segment_fp_data <- function(filenames, n.trials,
     if (length(tmp.ind) != num.trials) stop(paste0("the current dataset should have ", num.trials, " trials, 
                                                    but start.trigger appears in ", length(tmp.ind)))
     trial.info <- list(onset = event.info$onset[tmp.ind] - round(samp.factor*start.prepend))
-    trial.info$offset <- c(tail(trial.info$onset+round(samp.factor*start.prepend)-1, -1), nrow(tmp.dt))
+    trial.info$offset <- c(utils::tail(trial.info$onset+round(samp.factor*start.prepend)-1, -1), nrow(tmp.dt))
     trial.ind <- vec_seq(trial.info$onset, trial.info$offset, 1)
     bioware.dt[, forceplate := lapply(trial.ind, FUN = function(x) copy(tmp.dt[x,]))]
     
@@ -280,7 +299,7 @@ segment_fp_data <- function(filenames, n.trials,
           ind.resp <- which(event.trial.segm[[itrial]]$values %in% response.trigger.list[[x]])
           ind.stim <- which(event.trial.segm[[itrial]]$values %in% stimulus.trigger.list[[x]])
           if (length(ind.resp) > 1 | length(ind.stim) > 1) stop("some trials include more than one stimulus- or response-trigger of the same list element")
-          return(tail(cumsum(event.trial.segm[[itrial]]$lengths[seq(ind.stim, ind.resp-1)]), 1)/samp.factor)
+          return(utils::tail(cumsum(event.trial.segm[[itrial]]$lengths[seq(ind.stim, ind.resp-1)]), 1)/samp.factor)
         } else {
           return(NA)
         }
@@ -342,10 +361,10 @@ segment_fp_data <- function(filenames, n.trials,
       for (j in 1:length(trial.ind)) {
         if (az0) {
           dCoP.names <- c("dCoPx", "dCoPy")
-          bioware.dt$forceplate[[j]][, (dCoP.names) := .(c(diff(CoPx), NaN), c(diff(CoPy), NaN))]
-          bioware.dt$forceplate[[j]][, (dCoP.names) := .(dCoPx - meansdiff[[j]]$CoPx, dCoPy - meansdiff[[j]]$CoPy)]
+          bioware.dt$forceplate[[j]][, (dCoP.names) := list(c(diff(CoPx), NaN), c(diff(CoPy), NaN))] # .()
+          bioware.dt$forceplate[[j]][, (dCoP.names) := list(dCoPx - meansdiff[[j]]$CoPx, dCoPy - meansdiff[[j]]$CoPy)] # .()
           setcolorder(bioware.dt$forceplate[[j]], c("events", time.name, measure.names.az0, dCoP.names, port.names))
-          bioware.dt$forceplate[[j]][, (c("CoPx", "CoPy")) := .(CoPx - means[[j]]$CoPx, CoPy - means[[j]]$CoPy)]
+          bioware.dt$forceplate[[j]][, (c("CoPx", "CoPy")) := list(CoPx - means[[j]]$CoPx, CoPy - means[[j]]$CoPy)] # .()
         }
         bioware.dt$forceplate[[j]][ , (measure.names) := lapply(measure.names, function(nam) .SD[[nam]] - means[[j]][[nam]]), .SDcols = measure.names]
         # setnames(bioware.dt$forceplate[[j]], c(cols), c(colsnew))
@@ -357,7 +376,7 @@ segment_fp_data <- function(filenames, n.trials,
     rm("bioware.dt")
     
     gc()
-    setTxtProgressBar(pb, i)
+    utils::setTxtProgressBar(pb, i)
     
   }
   

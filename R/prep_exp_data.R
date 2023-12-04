@@ -16,14 +16,29 @@
 #' @param sort TRUE or FALSE. If TRUE the data will be sorted by subject number and block number.
 #' @return A \code{data.table} of the class \code{exp.prep}.
 #' @examples 
-#' # Using example data from github
-#' filenames <- tempfile(pattern = c("subj099_"), tmpdir = tempdir(), fileext = ".csv")
-#' 
-#' download.file(url = "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv", filenames)
-#' 
-#' exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
+#' # Using example data from github which requires internet
+#' \dontrun{
+#' if (curl::has_internet()) {
+#'   url <- "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv"
+#'   
+#'   # Safe download, handling potential errors
+#'   tryCatch({
+#'     filenames <- tempfile(pattern = c("subj099_"), tmpdir = tempdir(), fileext = ".csv")
+#'     download.file(url, filenames)
+#'     
+#'     # prepare experimental data
+#'     exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
+#'     
+#'     # Clean up
+#'     unlink(temp_file)
+#'   }, error = function(e) {
+#'     message("Failed to download data: ", e$message)
+#'   })
+#' }
+#' }
 #'                          
 #' @author Raphael Hartmann & Anton Koger
+#' @export
 #' @importFrom data.table ":=" fread rbindlist setattr setorder
 #' @importFrom stats complete.cases
 prep_exp_data <- function(filenames,
@@ -33,6 +48,9 @@ prep_exp_data <- function(filenames,
                           whitelist.vars = NULL,
                           sort = TRUE) {
 
+  # FOR USE WITH DATA.TABLE IN PACKAGES
+  subjNR <- blockNR <- NULL
+  
   # CHECKS
   check_character_vector(filenames)
   check_character_vector(na.strings)

@@ -1,5 +1,5 @@
 check_subj_in_character <- function(x) {
-  if (!all(grepl("subj[0-9]+", filenames))) stop(paste0("all ", deparse(substitute(x)), " must contain \"subj\" directly followed by a number"))
+  if (!all(grepl("subj[0-9]+", x))) stop(paste0("all ", deparse(substitute(x)), " must contain \"subj\" directly followed by a number"))
 }
 
 check_block_in_character <- function(x) {
@@ -8,7 +8,7 @@ check_block_in_character <- function(x) {
       if (!grepl("block[0-9]+", x[i])) stop(paste0("if one element of ", deparse(substitute(x)), " contains \"block\" it must be directly followed by a number"))
     }
   }
-  if (!all(grepl("subj[0-9]+", filenames))) stop(paste0("all ", deparse(substitute(x)), " must contain \"subj\" directly followed by a number"))
+  if (!all(grepl("subj[0-9]+", x))) stop(paste0("all ", deparse(substitute(x)), " must contain \"subj\" directly followed by a number"))
 }
 
 check_character_vector <- function(x) {
@@ -20,7 +20,7 @@ check_numeric_vector <- function(x) {
 }
 
 check_characterORnumeric_vector <- function(x) {
-  if (!is.character(excl.vars) & !is.numeric(excl.vars)) stop(paste0(deparse(substitute(x)), " must be a (vector of) character(s) or numeric(s)"))
+  if (!is.character(x) & !is.numeric(x)) stop(paste0(deparse(substitute(x)), " must be a (vector of) character(s) or numeric(s)"))
 }
 
 check_logical_element <- function(x) {

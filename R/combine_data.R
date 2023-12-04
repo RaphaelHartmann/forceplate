@@ -11,8 +11,11 @@
 #'   share the same class, or of the class \code{dt.comb}.
 #' @author Raphael Hartmann & Anton Koger
 #' @export
-#' @importFrom data.table setcolorder rbindlist fintersect
+#' @importFrom data.table ".SD" setcolorder rbindlist fintersect
 combine_data <- function(dt1, dt2) {
+  
+  # FOR USE WITH DATA.TABLE IN PACKAGES
+  forceplate <- NULL
   
   # GET COLUMN NAMES
   col.names1 <- colnames(dt1)

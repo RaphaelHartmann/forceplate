@@ -6,7 +6,8 @@ Authors@R:
       person("Anton", "Koger", , "anton.koger@psych.rwth-aachen.de", role = c("aut", "ctb"), comment = c(ORCID = "0009-0004-6906-5184")),
       person("Leif", "Johannsen", , "leif.johannsen@psych.rwth-aachen.de", role = c("ctb")))
 Description: What the package does (one paragraph).
-Imports: data.table, signal, stats
+Imports: data.table, signal, stats, stringi
+Suggests: curl
 License: GPL (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

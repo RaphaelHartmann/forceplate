@@ -51,20 +51,22 @@ event_transcription <- function(dt, correction = TRUE, verbose = FALSE) {
       tmp.event.info <- clean_rle(event.info)
       tmp.ecb <- inverse.rle(tmp.event.info)
       if (length(tmp.ecb) == nrow(dt)) {
-        dt[, events := tmp.ecb]
+        dt[, "events" := tmp.ecb]
         event.info <- tmp.event.info
       }
       if (verbose) message("correction for unwanted trigger numbers applied")
     }
   }
   cs <- cumsum(event.info$lengths)
-  event.info$onsets <- c(0, head(cs, -1))+1
+  event.info$onsets <- c(0, utils::head(cs, -1))+1
   event.info$offsets <- cs
   return(event.info)
 }
 
 #' @importFrom data.table ":="
-make_bins <- function(bins, bin.width = NULL, n.bins = NULL, sampling.freq = 1000) {
+make_bins <- function(bins, bin.width = NULL, n.bins = NULL, sampling.freq = 1000, verbose = FALSE) {
+  
+  upper <- lower <- NULL
   
   sampling.factor <- sampling.freq/1000
   
@@ -137,24 +139,24 @@ filter_w_padding <- function(bf, vec, time) {
     ind.0 <- which(vec==0)
     # ind.excl <- c(ind.NA, ind.0)
     # ind.keep <- setdiff(seq_along(vec), ind.excl)
-    vec <- spline(x = time, y = vec, xout = time)$y
+    vec <- stats::spline(x = time, y = vec, xout = time)$y
     # vec <- vec[ind.keep]
   }
   
   len.vec <- length(vec)
   j <- ifelse(len.vec < 2000, len.vec, 2000)
   
-  tmp.vec <- c(rev(head(vec, j)[-1]), vec)
+  tmp.vec <- c(rev(utils::head(vec, j)[-1]), vec)
   
   # first pass filtering
-  vec <- tail(filter(bf, tmp.vec), len.vec)
+  vec <- utils::tail(filter(bf, tmp.vec), len.vec)
   
   # reverse for second pass filtering
   vec <- rev(vec)
-  tmp.vec <- c(rev(head(vec, j)[-1]), vec)
+  tmp.vec <- c(rev(utils::head(vec, j)[-1]), vec)
   
   # second pass filtering
-  vec <- tail(filter(bf, tmp.vec), len.vec)
+  vec <- utils::tail(filter(bf, tmp.vec), len.vec)
   
   # reverse back
   vec <- rev(vec)
@@ -258,7 +260,7 @@ set_measure_names <- function(variable.names, old.names) {
   stop("please use variable.names to specify which variables correspond to the Fx, Fy, Fz, Mx, My, and Mz")
 }
 
-correct_time_variable <- function(filename, dt, samp.freq, time.name) {
+correct_time_variable <- function(filenames, dt, samp.freq, time.name) {
   if (any(!(1:(nrow(dt)-2))/samp.freq %in% dt[[time.name]])) message(paste0(filenames, " might have missing values or your sampling.freq is not correctly set"))
   if (any(is.na(dt[[time.name]]))) {
     not.na.ind <- which(!is.na(dt[[time.name]]))[1:2]

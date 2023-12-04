@@ -38,12 +38,26 @@ Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Cod
 \code{myvariable} geschrieben werden.
 }
 \examples{
-# Using example data from github
-filenames <- tempfile(pattern = c("subj099_"), tmpdir = tempdir(), fileext = ".csv")
-
-download.file(url = "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv", filenames)
-
-exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
+# Using example data from github which requires internet
+\dontrun{
+if (curl::has_internet()) {
+  url <- "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv"
+  
+  # Safe download, handling potential errors
+  tryCatch({
+    filenames <- tempfile(pattern = c("subj099_"), tmpdir = tempdir(), fileext = ".csv")
+    download.file(url, filenames)
+    
+    # prepare experimental data
+    exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
+    
+    # Clean up
+    unlink(temp_file)
+  }, error = function(e) {
+    message("Failed to download data: ", e$message)
+  })
+}
+}
                          
 }
 \author{

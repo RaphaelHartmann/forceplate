@@ -37,21 +37,35 @@
 #'   event-related approach using response-aligned force-plate time series data. 
 #'   \emph{Psychological Research, 87}, 2297–2315. 
 #' @examples 
-#' # Using example data from github
-#' filenames <- tempfile(pattern = c("subj099_block001_", "subj099_block002_"), tmpdir = tempdir(), fileext = ".txt")
-#' 
-#' download.file(url = c("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block001.txt",
-#'                       "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block002.txt"), filenames)
-#' 
-#' fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
-#'                          baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
-#'                          stimulus.trigger.list = c(2, 4, 8, 16),
-#'                          response.trigger.list = c(32,64),
-#'                          cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
-#'                          
-#' # Response-locking with 2 bins before and 2 bins after response onset. Each bin is 100 ms.
-#' tl.dt <- time_lock_fp_data(fp.dt = fp.dt, vars = c("Mx", "My"), time.lock.trigger = c(32, 64), bins = c(-200, 200),
-#'                            n.bins = 4, FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))))
+#' # Using example data from github which requires internet
+#' \dontrun{
+#' if (curl::has_internet()) {
+#'   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
+#'                 "main/data/subj099_block001.txt")
+#'   
+#'   # Safe download, handling potential errors
+#'   tryCatch({
+#'     filenames <- tempfile(pattern = c("subj099_block001_"), 
+#'                           tmpdir = tempdir(), fileext = ".txt")
+#'     download.file(url, filenames)
+#'     fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
+#'                              baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
+#'                              stimulus.trigger.list = c(2, 4, 8, 16),
+#'                              response.trigger.list = c(32,64),
+#'                              cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+#'     
+#'     # Response-locking with 2 bins before and 2 bins after response onset. Each bin is 100 ms.
+#'     tl.dt <- time_lock_fp_data(fp.dt = fp.dt, vars = c("Mx", "My"), 
+#'                                time.lock.trigger = c(32, 64), bins = c(-200, 200), n.bins = 4, 
+#'                                FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))))
+#'     
+#'     # Clean up
+#'     unlink(temp_file)
+#'   }, error = function(e) {
+#'     message("Failed to download data: ", e$message)
+#'   })
+#' }
+#' }
 #' 
 #' @author Raphael Hartmann & Anton Koger
 #' @export
@@ -59,10 +73,13 @@
 time_lock_fp_data <- function(fp.dt, vars,
                               time.lock.trigger,
                               bins, bin.width = NULL, n.bins = NULL,
-                              # sampling.freq = 1000,
-                              FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))),
-                              verbose = FALSE) {
+                              FUN = list(mean = mean, sd = stats::sd, range = function(x) diff(range(x)))) {
 
+  verbose = FALSE
+  
+  # FOR USE WITH DATA.TABLE IN PACKAGES
+  forceplate <- NULL
+  
   # CHECKS
   check_data.table(fp.dt)
   if (!inherits(fp.dt, "fp.segm")) stop("fp.dt must be a data.table produced by segment_fp_data()")
@@ -95,8 +112,8 @@ time_lock_fp_data <- function(fp.dt, vars,
     }
     if (length(tmp.ind) > 0) {
       n.dp <- sum(event.info$lengths)
-      if (tail((cumsum(event.info$lengths[1:(tmp.ind-1)])), 1) < abs(min(unlist(bins.dp)))) stop("bins out of bounds! At least one of the lower bounds of bins is too small")
-      if (n.dp - tail(cumsum(event.info$lengths[1:(tmp.ind-1)]), 1) < abs(max(unlist(bins.dp)))) stop("bins out of bounds! At least one of the upper bounds of bins is too large")
+      if (utils::tail((cumsum(event.info$lengths[1:(tmp.ind-1)])), 1) < abs(min(unlist(bins.dp)))) stop("bins out of bounds! At least one of the lower bounds of bins is too small")
+      if (n.dp - utils::tail(cumsum(event.info$lengths[1:(tmp.ind-1)]), 1) < abs(max(unlist(bins.dp)))) stop("bins out of bounds! At least one of the upper bounds of bins is too large")
       fp.dt.copy$forceplate[[i]][, bins := list()]
     } else {
       cols.excl[k] <- i
@@ -119,7 +136,7 @@ time_lock_fp_data <- function(fp.dt, vars,
   fp.dt.copy[, (params.names) := lapply(params.names, function(x) as.numeric(rep(NA, n.rows.bwdt)))]
   # params <- as.data.table(append(list(fp.dt.copy$subj, fp.dt.copy$block, fp.dt.copy$trial), lapply(params.names, function(x) as.numeric(rep(NA, n.rows.bwdt)))))
   # setnames(params, c("subj", "block", "trial", params.names))
-  pb <- txtProgressBar(style = 3, min = 0, max = n.rows.bwdt, width = 50)
+  pb <- utils::txtProgressBar(style = 3, min = 0, max = n.rows.bwdt, width = 50)
   for (i in 1:n.rows.bwdt) {
 
     if (!i %in% cols.excl) {
@@ -163,7 +180,7 @@ time_lock_fp_data <- function(fp.dt, vars,
     }
 
     gc()
-    setTxtProgressBar(pb, i)
+    utils::setTxtProgressBar(pb, i)
     # if (i %% (n.rows.bwdt %/% 50) == 0) {
     #   setTxtProgressBar(pb, i)
     # } else if (i == n.rows.bwdt) setTxtProgressBar(pb, i)
