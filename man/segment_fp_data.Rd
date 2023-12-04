@@ -75,7 +75,7 @@ with the only restriction being that the right hand side does not contain the st
 \item{skip}{A number giving the number of lines in the raw force-plate data to skip. In BioWare this is 19. The real data
 starts at line 20. Therefore the default value is set to 19.}
 
-\item{az0}{??????????????}
+\item{az0}{Negative displacement in millimeters. Also referred to as thickness parameter of the force plate.}
 
 \item{sampling.freq}{A number giving the sampling frequency. Typically 1000 Hz.}
 
