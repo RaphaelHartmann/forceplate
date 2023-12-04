@@ -9,14 +9,20 @@
 #' @param excl.vars A (vector of) number(s) or character(s) providing the column number(s) or name(s) 
 #'   of the data which will be used for spotting rows that are not trials, that is, rows that are
 #'   NA in each of the columns \code{excl.vars}.
-#' @param blacklist.vars A (vector of) character(s) providing the name(s) of variables to be deleted
-#'   from the data. NULL means no variable will be deleted.
-#' @param whitelist.vars A (vector of) character(s) providing the name(s) of variables to be kept
-#'   in the data. All others will be deleted. NULL means all variables will be kept.
+#' @param blacklist.vars A (vector of) number(s) or character(s) providing the column number(s) or name(s) 
+#'   of variables to be deleted from the data. NULL means no variable will be deleted.
+#' @param whitelist.vars A (vector of) number(s) or character(s) providing the column number(s) or name(s) 
+#'   of variables to be kept in the data. All others will be deleted. NULL means all variables will be kept.
 #' @param sort TRUE or FALSE. If TRUE the data will be sorted by subject number and block number.
 #' @return A \code{data.table} of the class \code{exp.prep}.
 #' @examples 
-#' # prep_exp_data()
+#' # Using example data from github
+#' filenames <- tempfile(pattern = c("subj099_"), tmpdir = tempdir(), fileext = ".csv")
+#' 
+#' download.file(url = "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv", filenames)
+#' 
+#' exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
+#'                          
 #' @author Raphael Hartmann & Anton Koger
 #' @importFrom data.table ":=" fread rbindlist setattr setorder
 #' @importFrom stats complete.cases
@@ -30,12 +36,14 @@ prep_exp_data <- function(filenames,
   # CHECKS
   check_character_vector(filenames)
   check_character_vector(na.strings)
-  check_characterORnumeric_vector(excl.vars)
+  if (!is.null(excl.vars)) {
+    check_characterORnumeric_vector(excl.vars)
+  }
   if (!is.null(blacklist.vars)) {
-    check_character_vector(blacklist.vars)
+    check_characterORnumeric_vector(blacklist.vars)
   }
   if (!is.null(whitelist.vars)) {
-    check_character_vector(whitelist.vars)
+    check_characterORnumeric_vector(whitelist.vars)
   }
   check_logical_element(sort)
 
@@ -48,13 +56,14 @@ prep_exp_data <- function(filenames,
     filenames <- sort(filenames)
     setorder(fn.info, subjNR, blockNR)
   }
+  
 
   complete.experimental.dt <- data.table()
 
   for (i in 1:length.fn) {
 
     # READ IN FILE BY NAME
-    temp.dt <- fread(filenames[i], na.strings = na.strings)
+    temp.dt <- fread(filenames[i], na.strings = na.strings, fill = TRUE)
 
     # DEFINE EXCLUSION VARIABLES BY NUMBER IF NOT ALREADY
     if (is.character(excl.vars)) {
@@ -64,11 +73,16 @@ prep_exp_data <- function(filenames,
     # REMOVE ROWS WITH NAs AND UNNECESSARY COLUMNS
     experimental.dt <- temp.dt[complete.cases(temp.dt[, .SD, .SDcols = excl.vars])]
     if (!is.null(blacklist.vars)) {
-      suppressWarnings(experimental.dt[, (blacklist.vars) := NULL])
+      if (is.numeric(blacklist.vars)) {
+        bl.vars <- names(experimental.dt)[blacklist.vars]
+      } else {
+        bl.vars <- blacklist.vars
+      }
+      suppressWarnings(experimental.dt[, (bl.vars) := NULL])
       if (!is.null(whitelist.vars)) message("whitelist.vars is ignored since blacklist.vars is provided")
     } else if (!is.null(whitelist.vars)) {
-      bl.vars <- setdiff(names(experimental.dt), blacklist.vars)
-      suppressWarnings(experimental.dt[, (blacklist.vars) := NULL])
+      bl.vars <- setdiff(names(experimental.dt), whitelist.vars)
+      suppressWarnings(experimental.dt[, (bl.vars) := NULL])
     }
 
 

@@ -47,7 +47,7 @@
 #' @param az0 ??????????????
 #' @param sampling.freq A number giving the sampling frequency. Typically 1000 Hz.
 #' @param cutoff.freq A number giving the cut-off frequency used for the low-pass 4th order Butterworth filter. If set to 0, 
-#'   no low-pass filter will be applied.
+#'   no low-pass filter will be applied. Default is 10 Hz.
 #' @param imputation If you expect any NaNs in your raw force-plate data you might use this argument. Use either of the 
 #'   following options: "fmm", "periodic", "natural", "monoH.FC", or "hyman". These are method options in the 
 #'   \code{stats::spline()} function. Usually this option is not needed and the default (NULL) can be used.
@@ -68,7 +68,18 @@
 #'   
 #' Winter, D. A. (2009). \emph{Biomechanics and Motor Control of Human Movement}.
 #' @examples 
-#' # segment_fp_data()
+#' # Using example data from github
+#' filenames <- tempfile(pattern = c("subj099_block001_", "subj099_block002_"), tmpdir = tempdir(), fileext = ".txt")
+#' 
+#' download.file(url = c("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block001.txt",
+#'                       "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099_block002.txt"), filenames)
+#' 
+#' fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
+#'                          baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
+#'                          stimulus.trigger.list = c(2, 4, 8, 16),
+#'                          response.trigger.list = c(32,64),
+#'                          cond.trigger.list = list(location_compat = c(2, 4, 8, 16))
+#' 
 #' @author Raphael Hartmann & Anton Koger
 #' @export
 #' @importFrom data.table ":=" copy fread rbindlist setattr setcolorder setnames setorder
