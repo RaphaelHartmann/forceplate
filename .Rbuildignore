@@ -1,2 +1,5 @@
 ^forceplate\.Rproj$
 ^\.Rproj\.user$
+^data$
+^shell\.nix$
+^_libs$
