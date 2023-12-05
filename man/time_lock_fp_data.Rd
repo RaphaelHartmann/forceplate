@@ -11,7 +11,7 @@ time_lock_fp_data(
   bins,
   bin.width = NULL,
   n.bins = NULL,
-  FUN = list(mean = mean, sd = stats::sd, range = function(x) diff(range(x)))
+  FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x)))
 )
 }
 \arguments{

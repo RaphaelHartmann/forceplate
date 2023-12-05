@@ -101,6 +101,8 @@
 #' 
 #' @author Raphael Hartmann & Anton Koger
 #' @export
+#' @importFrom stats spline
+#' @importFrom utils txtProgressBar tail setTxtProgressBar
 #' @importFrom data.table ":=" copy fread rbindlist setattr setcolorder setnames setorder
 #' @importFrom signal butter
 #' @importFrom stringi stri_count_regex
@@ -170,7 +172,7 @@ segment_fp_data <- function(filenames, n.trials,
   }
   
   # PREPARE PROGRESS BAR
-  pb <- utils::txtProgressBar(style = 3, min = 0, max = length.fn, width = 50)
+  pb <- txtProgressBar(style = 3, min = 0, max = length.fn, width = 50)
   
   # VARIABLE MAPPING
   tmp.new.names <- NULL
@@ -179,7 +181,7 @@ segment_fp_data <- function(filenames, n.trials,
   pattern_regex <- paste(patterns, collapse = "|")
   lines <- readLines(filenames[1], n = skip)
   counts <- stri_count_regex(lines, pattern_regex)
-  old.names <- strsplit(lines[utils::tail(which.max(counts), 1)], "\t")[[1]]
+  old.names <- strsplit(lines[tail(which.max(counts), 1)], "\t")[[1]]
   if (!is.null(variable.names)) {
     if (any(!as.character(unlist(variable.names)) %in% old.names)) stop("make sure all names in variable.names are in the data as well")
   }
@@ -214,7 +216,7 @@ segment_fp_data <- function(filenames, n.trials,
     correct_time_variable(filenames[i], tmp.dt, sampling.freq, time.name)
     
     # IMPUTATION IF WANTED
-    if (!is.null(imputation)) tmp.dt[, (measure.names) := lapply(.SD, function(x) stats::spline(x = tmp.dt[[time.name]], y = x, xout = tmp.dt[[time.name]], method = imputation)$y), .SDcols = measure.names]
+    if (!is.null(imputation)) tmp.dt[, (measure.names) := lapply(.SD, function(x) spline(x = tmp.dt[[time.name]], y = x, xout = tmp.dt[[time.name]], method = imputation)$y), .SDcols = measure.names]
     
     # LOW-PASS FILTER (BUTTERWORTH 4TH ORDER)
     if (cutoff.freq) tmp.dt[, (measure.names) := lapply(.SD, function(x) filter_w_padding(bf, x, tmp.dt[[time.name]])), .SDcols = measure.names]
@@ -251,7 +253,7 @@ segment_fp_data <- function(filenames, n.trials,
     if (length(tmp.ind) != num.trials) stop(paste0("the current dataset should have ", num.trials, " trials, 
                                                    but start.trigger appears in ", length(tmp.ind)))
     trial.info <- list(onset = event.info$onset[tmp.ind] - round(samp.factor*start.prepend))
-    trial.info$offset <- c(utils::tail(trial.info$onset+round(samp.factor*start.prepend)-1, -1), nrow(tmp.dt))
+    trial.info$offset <- c(tail(trial.info$onset+round(samp.factor*start.prepend)-1, -1), nrow(tmp.dt))
     trial.ind <- vec_seq(trial.info$onset, trial.info$offset, 1)
     bioware.dt[, forceplate := lapply(trial.ind, FUN = function(x) copy(tmp.dt[x,]))]
     
@@ -304,7 +306,7 @@ segment_fp_data <- function(filenames, n.trials,
           ind.resp <- which(event.trial.segm[[itrial]]$values %in% response.trigger.list[[x]])
           ind.stim <- which(event.trial.segm[[itrial]]$values %in% stimulus.trigger.list[[x]])
           if (length(ind.resp) > 1 | length(ind.stim) > 1) stop("some trials include more than one stimulus- or response-trigger of the same list element")
-          return(utils::tail(cumsum(event.trial.segm[[itrial]]$lengths[seq(ind.stim, ind.resp-1)]), 1)/samp.factor)
+          return(tail(cumsum(event.trial.segm[[itrial]]$lengths[seq(ind.stim, ind.resp-1)]), 1)/samp.factor)
         } else {
           return(NA)
         }
@@ -381,7 +383,7 @@ segment_fp_data <- function(filenames, n.trials,
     rm("bioware.dt")
     
     gc()
-    utils::setTxtProgressBar(pb, i)
+    setTxtProgressBar(pb, i)
     
   }
   

@@ -41,6 +41,7 @@ event_encoder <- function(byte, port.ind) {
   return(events)
 }
 
+#' @importFrom utils head
 #' @importFrom data.table ":="
 event_transcription <- function(dt, correction = TRUE, verbose = FALSE) {
   unique.trigger <- unique(dt$events)
@@ -58,7 +59,7 @@ event_transcription <- function(dt, correction = TRUE, verbose = FALSE) {
     }
   }
   cs <- cumsum(event.info$lengths)
-  event.info$onsets <- c(0, utils::head(cs, -1))+1
+  event.info$onsets <- c(0, head(cs, -1))+1
   event.info$offsets <- cs
   return(event.info)
 }
@@ -124,6 +125,8 @@ create_sublist <- function(mat.names, n.dt.rows, fun.names) {
   return(sublist)
 }
 
+#' @importFrom utils head tail
+#' @importFrom stats spline
 #' @importFrom signal filter
 filter_w_padding <- function(bf, vec, time) {
   
@@ -139,24 +142,24 @@ filter_w_padding <- function(bf, vec, time) {
     ind.0 <- which(vec==0)
     # ind.excl <- c(ind.NA, ind.0)
     # ind.keep <- setdiff(seq_along(vec), ind.excl)
-    vec <- stats::spline(x = time, y = vec, xout = time)$y
+    vec <- spline(x = time, y = vec, xout = time)$y
     # vec <- vec[ind.keep]
   }
   
   len.vec <- length(vec)
   j <- ifelse(len.vec < 2000, len.vec, 2000)
   
-  tmp.vec <- c(rev(utils::head(vec, j)[-1]), vec)
+  tmp.vec <- c(rev(head(vec, j)[-1]), vec)
   
   # first pass filtering
-  vec <- utils::tail(filter(bf, tmp.vec), len.vec)
+  vec <- tail(filter(bf, tmp.vec), len.vec)
   
   # reverse for second pass filtering
   vec <- rev(vec)
-  tmp.vec <- c(rev(utils::head(vec, j)[-1]), vec)
+  tmp.vec <- c(rev(head(vec, j)[-1]), vec)
   
   # second pass filtering
-  vec <- utils::tail(filter(bf, tmp.vec), len.vec)
+  vec <- tail(filter(bf, tmp.vec), len.vec)
   
   # reverse back
   vec <- rev(vec)

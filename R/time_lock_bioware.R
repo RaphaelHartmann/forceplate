@@ -70,11 +70,13 @@
 #' 
 #' @author Raphael Hartmann & Anton Koger
 #' @export
+#' @importFrom utils tail txtProgressBar setTxtProgressBar
+#' @importFrom stats sd
 #' @importFrom data.table ":=" copy setattr setnames
 time_lock_fp_data <- function(fp.dt, vars,
                               time.lock.trigger,
                               bins, bin.width = NULL, n.bins = NULL,
-                              FUN = list(mean = mean, sd = stats::sd, range = function(x) diff(range(x)))) {
+                              FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x)))) {
 
   verbose = FALSE
   
@@ -113,8 +115,8 @@ time_lock_fp_data <- function(fp.dt, vars,
     }
     if (length(tmp.ind) > 0) {
       n.dp <- sum(event.info$lengths)
-      if (utils::tail((cumsum(event.info$lengths[1:(tmp.ind-1)])), 1) < abs(min(unlist(bins.dp)))) stop("bins out of bounds! At least one of the lower bounds of bins is too small")
-      if (n.dp - utils::tail(cumsum(event.info$lengths[1:(tmp.ind-1)]), 1) < abs(max(unlist(bins.dp)))) stop("bins out of bounds! At least one of the upper bounds of bins is too large")
+      if (tail((cumsum(event.info$lengths[1:(tmp.ind-1)])), 1) < abs(min(unlist(bins.dp)))) stop("bins out of bounds! At least one of the lower bounds of bins is too small")
+      if (n.dp - tail(cumsum(event.info$lengths[1:(tmp.ind-1)]), 1) < abs(max(unlist(bins.dp)))) stop("bins out of bounds! At least one of the upper bounds of bins is too large")
       fp.dt.copy$forceplate[[i]][, bins := list()]
     } else {
       cols.excl[k] <- i
@@ -137,7 +139,7 @@ time_lock_fp_data <- function(fp.dt, vars,
   fp.dt.copy[, (params.names) := lapply(params.names, function(x) as.numeric(rep(NA, n.rows.bwdt)))]
   # params <- as.data.table(append(list(fp.dt.copy$subj, fp.dt.copy$block, fp.dt.copy$trial), lapply(params.names, function(x) as.numeric(rep(NA, n.rows.bwdt)))))
   # setnames(params, c("subj", "block", "trial", params.names))
-  pb <- utils::txtProgressBar(style = 3, min = 0, max = n.rows.bwdt, width = 50)
+  pb <- txtProgressBar(style = 3, min = 0, max = n.rows.bwdt, width = 50)
   for (i in 1:n.rows.bwdt) {
 
     if (!i %in% cols.excl) {
@@ -181,7 +183,7 @@ time_lock_fp_data <- function(fp.dt, vars,
     }
 
     gc()
-    utils::setTxtProgressBar(pb, i)
+    setTxtProgressBar(pb, i)
   }
 
   close(pb)
