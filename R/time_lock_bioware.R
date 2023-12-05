@@ -1,8 +1,9 @@
 
 #' Calculate Statistics for Time Locked Bins
 #' 
-#' Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
-#'   \code{myvariable} geschrieben werden.
+#' Processing segmented force-plate data by calculating descriptive statistics like mean, standard
+#'   deviation, and range for defined time bins around time-locked events, such as stimulus onset
+#'   or response onset etc.
 #'
 #' @param fp.dt A \code{data.table} of the class \code{"fp.segm"} produced by \code{segment_fp_data()}.
 #' @param vars A (vector of) character(s) giving the variable names in \code{fp.dt$forceplate}, for
@@ -181,9 +182,6 @@ time_lock_fp_data <- function(fp.dt, vars,
 
     gc()
     utils::setTxtProgressBar(pb, i)
-    # if (i %% (n.rows.bwdt %/% 50) == 0) {
-    #   setTxtProgressBar(pb, i)
-    # } else if (i == n.rows.bwdt) setTxtProgressBar(pb, i)
   }
 
   close(pb)

@@ -1,13 +1,13 @@
 
 #' Combine Data Tables
 #' 
-#' Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
-#'   \code{myvariable} geschrieben werden.
+#' Combine two \code{data.table}s, either two force-plate data, two exeperimental data, or one 
+#'   force-plate and one experimental data.
 #'
-#' @param dt1 A data.table of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}.
-#' @param dt2 A data.table of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}. Make
+#' @param dt1 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}.
+#' @param dt2 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}. Make
 #'   sure the two data.table have either the same number of rows or the same columns.
-#' @return A \code{data.table} either of the same class as the \code{dt1} and \code{dt2}, if they
+#' @return A \code{data.table} either of the same class as \code{dt1} and \code{dt2}, if they
 #'   share the same class, or of the class \code{dt.comb}.
 #' @author Raphael Hartmann & Anton Koger
 #' @export

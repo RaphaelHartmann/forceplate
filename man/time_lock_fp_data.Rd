@@ -53,8 +53,9 @@ by \code{FUN}.
 }
 }
 \description{
-Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
-\code{myvariable} geschrieben werden.
+Processing segmented force-plate data by calculating descriptive statistics like mean, standard
+deviation, and range for defined time bins around time-locked events, such as stimulus onset
+or response onset etc.
 }
 \examples{
 # Using example data from github which requires internet

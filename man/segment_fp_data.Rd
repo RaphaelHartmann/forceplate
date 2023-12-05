@@ -75,7 +75,9 @@ with the only restriction being that the right hand side does not contain the st
 \item{skip}{A number giving the number of lines in the raw force-plate data to skip. In BioWare this is 19. The real data
 starts at line 20. Therefore the default value is set to 19.}
 
-\item{az0}{Negative displacement in millimeters. Also referred to as thickness parameter of the force plate.}
+\item{az0}{Thickness parameter of the force plate in millimeter and negative. If this value (e.g., -41 for the Kistler
+force plate type 9260AA) is not 0 then the center of pressure in the x- and y-direction is calculated (like in
+Johannsen et al., 2023) using this value.}
 
 \item{sampling.freq}{A number giving the sampling frequency. Typically 1000 Hz.}
 
@@ -100,8 +102,10 @@ The following variables are included in the \code{data.table}:
 }
 }
 \description{
-Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
-\code{myvariable} geschrieben werden.
+Processing force-plate data by segmenting the data in trials, baseline correct each trial (optional),
+applying a low-pass 4th order Butterworth filter (optional), labeling stimuli and response onsets
+in each trial, labeling conditions in each trial and some more (see below). The output is a
+\code{data.table}.
 }
 \examples{
 # Using example data from github which requires internet

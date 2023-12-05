@@ -34,8 +34,8 @@ of variables to be kept in the data. All others will be deleted. NULL means all 
 A \code{data.table} of the class \code{exp.prep}.
 }
 \description{
-Hier kommt die Beschreibung der Funktion in einem Paragraphen. Variablen und Code kann mittels
-\code{myvariable} geschrieben werden.
+Processing the experimental data by removing unnecessary variables and removing rows in the data
+that are not trials. The output is a \code{data.table}.
 }
 \examples{
 # Using example data from github which requires internet
