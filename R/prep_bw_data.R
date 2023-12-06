@@ -148,7 +148,7 @@ segment_fp_data <- function(filenames, n.trials,
   check_numeric_element(skip)
   if (skip < 1) stop("skip must be larger than 0")
   check_numeric_element(az0)
-  if (az0 < 0) stop("az0 must be negative")
+  if (az0 > 0) stop("az0 must be negative")
   check_logical_element(sort)
   if (!is.null(imputation)) check_imputation(imputation)
   check_numeric_element(sampling.freq)
