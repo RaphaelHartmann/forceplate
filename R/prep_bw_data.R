@@ -92,7 +92,7 @@
 #'                              cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
 #'     
 #'     # Clean up
-#'     unlink(temp_file)
+#'     unlink(filenames)
 #'   }, error = function(e) {
 #'     message("Failed to download data: ", e$message)
 #'   })

@@ -61,7 +61,7 @@
 #'                                FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))))
 #'     
 #'     # Clean up
-#'     unlink(temp_file)
+#'     unlink(filenames)
 #'   }, error = function(e) {
 #'     message("Failed to download data: ", e$message)
 #'   })

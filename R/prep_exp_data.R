@@ -30,7 +30,7 @@
 #'     exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
 #'     
 #'     # Clean up
-#'     unlink(temp_file)
+#'     unlink(filenames)
 #'   }, error = function(e) {
 #'     message("Failed to download data: ", e$message)
 #'   })
