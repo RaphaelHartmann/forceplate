@@ -14,7 +14,7 @@ prep_exp_data(
 )
 }
 \arguments{
-\item{filenames}{A (vector of) character(s) providing the raw experimental data file name(s)..}
+\item{filenames}{A (vector of) character(s) providing the raw experimental data file name(s).}
 
 \item{na.strings}{A (vector of) character(s) naming the strings that should be treated as NA.}
 
