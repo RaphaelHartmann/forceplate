@@ -3,14 +3,14 @@
 #' 
 #' Processing force-plate data by segmenting the data in trials, baseline correct each trial (optional),
 #'   applying a low-pass 4th order Butterworth filter (optional), labeling stimuli and response onsets
-#'   in each trial, labeling conditions in each trial and some more (see below). The output is a 
+#'   in each trial, labeling conditions in each trial, and some more (see below). The output is a 
 #'   \code{data.table}. 
 #'
 #' @param filenames A (vector of) character(s) providing the raw force-plate file name(s).
 #' @param n.trials A (vector of) number(s) providing the number of trial (per filename).
 #' @param start.trigger A (vector of) number(s) providing the trigger(s) marking the beginning of a trial.
-#' @param start.prepend A number giving the number of milliseconds to prepend before the \code{start.trigger}.
-#'   If this is not 0 then each trial will have additional \code{start.prepend} milliseconds added at the
+#' @param start.prepend A number giving the amount of data points (usually in milliseconds when using a @param sampling.freq of 1000 Hz) to prepend before the \code{start.trigger}.
+#'   If this is not 0 then each trial will have additional \code{start.prepend} data points added at the
 #'   beginning of each trial.
 #' @param stimulus.trigger.list If a trial contains one task only, then a vector providing the trigger(s) 
 #'   marking the onset of the stimulus. If a trial contains more than one task, then a named list of vectors
@@ -23,7 +23,7 @@
 #'   used as zero point for the next argument (\code{baseline.intv}). Use 0 to indicate that you wish to use no
 #'   baseline correction.
 #' @param baseline.intv A vector of length 2 providing the lower and upper bounds of the interval that will
-#'   be used as baseline interval (in milliseconds). For each measurement variable the mean of the data points 
+#'   be used as baseline interval (usually in milliseconds when using a @param sampling.freq of 1000 Hz). For each measurement variable the mean of the data points 
 #'   that fall into this interval will subtracted from all data points within a trial.
 #' @param cond.trigger.list A named list of vectors providing the trigger(s) marking the conditions.
 #' @param variable.names If used (i.e., not NULL), a named list of names. This will rename the variables of the 
