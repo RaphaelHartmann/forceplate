@@ -4,7 +4,7 @@
 #' Processing the experimental data by removing unnecessary variables and removing rows in the data
 #'   that are not trials. The output is a \code{data.table}.
 #'
-#' @param filenames A (vector of) character(s) providing the raw experimental data file name(s).
+#' @param filenames A (vector of) character(s) providing the raw experimental data file name(s). Files can be .txt, .csv, or any common type.
 #' @param na.strings A (vector of) character(s) naming the strings that should be treated as NA.
 #' @param excl.vars A (vector of) number(s) or character(s) providing the column number(s) or name(s) 
 #'   of the data which will be used for spotting rows that are not trials, that is, rows that are
