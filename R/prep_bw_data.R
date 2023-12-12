@@ -3,10 +3,10 @@
 #' 
 #' Processing force-plate data by segmenting the data in trials, baseline correct each trial (optional),
 #'   applying a low-pass 4th order Butterworth filter (optional), labeling stimuli and response onsets
-#'   in each trial, labeling conditions in each trial and some more (see below). The output is a 
+#'   in each trial, labeling conditions in each trial, and some more (see below). The output is a 
 #'   \code{data.table}. 
 #'
-#' @param filenames A (vector of) character(s) providing the raw force-plate file name(s).
+#' @param filenames A (vector of) character(s) providing the raw force-plate file name(s). Files should be in tab-delimited .txt-format. 
 #' @param n.trials A (vector of) number(s) providing the number of trial (per filename).
 #' @param start.trigger A (vector of) number(s) providing the trigger(s) marking the beginning of a trial.
 #' @param start.prepend A number giving the number of milliseconds to prepend before the \code{start.trigger}.
@@ -15,32 +15,32 @@
 #' @param stimulus.trigger.list If a trial contains one task only, then a vector providing the trigger(s) 
 #'   marking the onset of the stimulus. If a trial contains more than one task, then a named list of vectors
 #'   providing the trigger(s) marking the onset of stimuli. For example, 
-#'   \code{auditory = c(2,3,4,5), visual = c(8, 9)}.
+#'   \code{visual = c(4, 5), auditory = c(16, 17)}.
 #' @param response.trigger.list Same as \code{stimulus.trigger.list} but with trigger(s) marking the onset
-#'   of responses. For example, \code{auditory = c(16,17), visual = c(32,33)}.
+#'   of responses. For example, \code{auditory = c(32, 33, 34, 36), visual = c(128, 129, 130, 132)}.
 #' @param baseline.trigger A (vector of) number(s) providing the trigger number(s) providing the reference for
 #'   the intervall for the baseline correction. For example, if set to 1 the onset of event with trigger 1 is
 #'   used as zero point for the next argument (\code{baseline.intv}). Use 0 to indicate that you wish to use no
 #'   baseline correction.
 #' @param baseline.intv A vector of length 2 providing the lower and upper bounds of the interval that will
-#'   be used as baseline interval (in milliseconds). For each measurement variable the mean of the data points 
-#'   that fall into this interval will subtracted from all data points within a trial.
+#'   be used as baseline interval (in milliseconds). For each measurement variable, the mean of the data points 
+#'   that fall into this interval will be subtracted from all data points within a trial.
 #' @param cond.trigger.list A named list of vectors providing the trigger(s) marking the conditions.
 #' @param variable.names If used (i.e., not NULL), a named list of names. This will rename the variables of the 
 #'   force-plate data. There are three cases to consider:
 #'   \itemize{
 #'     \item the time variable: if your force-plate data does not contain a variable with the string "time" in it
-#'       or you want to rename the time variable in the force-plate data you can specify 
+#'       or you want to rename the time variable in the force-plate data, you can specify 
 #'       \code{time = "fp_time_name"} in the \code{variable.names} list. The left hand side must be an expression 
 #'       that contains the string "time". The right hand side must be the actual variable name in your raw force-plate data
 #'       you want to replace.
 #'     \item the parallel port variable: if your force-plate data does not contain variables with the string "port" in it
-#'       or you want to rename the port variables in the force-plate data you can specify 
+#'       or you want to rename the port variables in the force-plate data, you can specify 
 #'       \code{port1 = "fp_port1_name"}, \code{port2 = "fp_port2_name"}, \code{port3 = "fp_port3_name"}, and so on, in the 
 #'       \code{variable.names} list. The left hand side must be the string "port" followed by a number. The right hand side
 #'       must be the actual variable name in the force-plate data you want to replace.
-#'     \item measurement variables: if you wish to rename some measurement variables in your force-plate data you can do so
-#'       with the only restriction being that the right hand side does not contain the strings "time" nor "port". For example
+#'     \item measurement variables: if you wish to rename some measurement variables in your force-plate data you can do so. 
+#'       The only restriction being that the right hand side does not contain the strings "time" nor "port". For example
 #'       \code{y_Force = "Fy"} is allowed. But we recommend sticking with the six basic measurement variable names
 #'       "Fx", "Fy", "Fz", "Mx", "My", and "Mz".
 #'   }
@@ -63,7 +63,7 @@
 #'     \item \code{block}: block number,
 #'     \item \code{trial}: trial number,
 #'     \item \code{forceplate}: force-plate data of each trial as \code{data.table}. Use, for example, 
-#'       \code{fp.dt$forceplate[[1]]} to open the force-plate data of the first trial, first block, and first subject
+#'       \code{fp.dt$forceplate[[1]]} to open the force-plate data of the first trial, first block, and first subject.
 #'   }
 #' @references
 #' Johannsen, L., Stephan, D. N., Straub, E., Döhring, F., Kiesel, A., Koch, I., & Müller, H. (2023). Assessing the influence of cognitive response conflict on balance control: An
@@ -72,7 +72,7 @@
 #'   
 #' Winter, D. A. (2009). \emph{Biomechanics and Motor Control of Human Movement}.
 #' @examples 
-#' # Using example data from github which requires internet
+#' # Using example data from GitHub which requires internet
 #' \dontrun{
 #' if (curl::has_internet()) {
 #'   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
