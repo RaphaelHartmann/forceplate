@@ -18,10 +18,10 @@ time_lock_fp_data(
 \item{fp.dt}{A \code{data.table} of the class \code{"fp.segm"} produced by \code{segment_fp_data()}.}
 
 \item{vars}{A (vector of) character(s) giving the variable names in \code{fp.dt$forceplate}, for
-which the statistics (see \code{FUN} below) should be calculated for each bin (see arguments below).}
+which the statistics (see \code{FUN} below) should be calculated for each bin (see arguments below). For example Fx, Fy, Mx, My etc.}
 
 \item{time.lock.trigger}{A (vector of) number(s) containing the trigger(s) marking the onset of the
-time locking. The onset of this trigger will be treated as reference (point zero) for the bins to
+time locking (the event of interest like stimulus onset or response onset). The onset of this trigger will be treated as reference (point zero) for the bins to
 be defined in the next argument(s).}
 
 \item{bins}{Either a vector of length 2 or a list of vectors of length 2 providing the lower and
@@ -48,7 +48,8 @@ The following variables are included in the \code{data.table}:
 \item \code{trial}: trial number,
 \item \code{forceplate}: force-plate data of each trial as \code{data.table}. Use, for example,
 \code{fp.dt$forceplate[[1]]} to open the force-plate data of the first trial, first block, and first subject
-\item for each combination of variable \code{vars} and bin a new variable is created by the function provided
+(if \code{sort} in the \code{\link{segment_fp_data}} was set to \code{TRUE}.
+\item For each combination of variable \code{vars} and \code{bin} a new variable is created by the function(s) provided
 by \code{FUN}.
 }
 }
