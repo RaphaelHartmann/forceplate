@@ -7,9 +7,9 @@
 #'
 #' @param fp.dt A \code{data.table} of the class \code{"fp.segm"} produced by \code{segment_fp_data()}.
 #' @param vars A (vector of) character(s) giving the variable names in \code{fp.dt$forceplate}, for
-#'   which the statistics (see \code{FUN} below) should be calculated for each bin (see arguments below).
+#'   which the statistics (see \code{FUN} below) should be calculated for each bin (see arguments below). For example Fx, Fy, Mx, My etc.
 #' @param time.lock.trigger A (vector of) number(s) containing the trigger(s) marking the onset of the
-#'   time locking. The onset of this trigger will be treated as reference (point zero) for the bins to
+#'   time locking (the event of interest like stimulus onset or response onset). The onset of this trigger will be treated as reference (point zero) for the bins to
 #'   be defined in the next argument(s).
 #' @param bins Either a vector of length 2 or a list of vectors of length 2 providing the lower and
 #'   upper boundaries of the bins (in milliseconds). If only one vector is used either one of the next
@@ -29,8 +29,9 @@
 #'     \item \code{block}: block number,
 #'     \item \code{trial}: trial number,
 #'     \item \code{forceplate}: force-plate data of each trial as \code{data.table}. Use, for example, 
-#'       \code{fp.dt$forceplate[[1]]} to open the force-plate data of the first trial, first block, and first subject
-#'     \item for each combination of variable \code{vars} and bin a new variable is created by the function provided
+#'       \code{fp.dt$forceplate[[1]]} to open the force-plate data of the first trial, first block, and first subject 
+#'       (if \code{sort} in the \code{\link{segment_fp_data}} was set to \code{TRUE}.
+#'     \item For each combination of variable \code{vars} and \code{bin} a new variable is created by the function(s) provided
 #'       by \code{FUN}.
 #'   }
 #' @references
