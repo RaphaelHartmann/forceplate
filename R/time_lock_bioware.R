@@ -30,7 +30,7 @@
 #'     \item \code{trial}: trial number,
 #'     \item \code{forceplate}: force-plate data of each trial as \code{data.table}. Use, for example, 
 #'       \code{fp.dt$forceplate[[1]]} to open the force-plate data of the first trial, first block, and first subject 
-#'       (if \code{sort} in the \code{segment_fp_data} is \code{TRUE}.
+#'       (if \code{sort} in the \code{\link{segment_fp_data}} was set to \code{TRUE}.
 #'     \item For each combination of variable \code{vars} and \code{bin} a new variable is created by the function(s) provided
 #'       by \code{FUN}.
 #'   }
