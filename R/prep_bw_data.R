@@ -73,7 +73,6 @@
 #' Winter, D. A. (2009). \emph{Biomechanics and Motor Control of Human Movement}.
 #' @examples 
 #' # Using example data from GitHub which requires internet
-#' \dontrun{
 #' if (curl::has_internet()) {
 #'   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
 #'                 "main/data/subj099_block001.txt")
@@ -96,7 +95,6 @@
 #'   }, error = function(e) {
 #'     message("Failed to download data: ", e$message)
 #'   })
-#' }
 #' }
 #' 
 #' @author Raphael Hartmann & Anton Koger

@@ -60,7 +60,6 @@ or response onset etc.
 }
 \examples{
 # Using example data from github which requires internet
-\dontrun{
 if (curl::has_internet()) {
   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
                 "main/data/subj099_block001.txt")
@@ -86,7 +85,6 @@ if (curl::has_internet()) {
   }, error = function(e) {
     message("Failed to download data: ", e$message)
   })
-}
 }
 
 }

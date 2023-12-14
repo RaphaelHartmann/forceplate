@@ -17,7 +17,6 @@
 #' @return A \code{data.table} of the class \code{exp.prep}.
 #' @examples 
 #' # Using example data from github which requires internet
-#' \dontrun{
 #' if (curl::has_internet()) {
 #'   url <- "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv"
 #'   
@@ -34,7 +33,6 @@
 #'   }, error = function(e) {
 #'     message("Failed to download data: ", e$message)
 #'   })
-#' }
 #' }
 #'                          
 #' @author Raphael Hartmann & Anton Koger

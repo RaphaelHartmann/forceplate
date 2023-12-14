@@ -40,7 +40,6 @@
 #'   \emph{Psychological Research, 87}, 2297–2315. 
 #' @examples 
 #' # Using example data from github which requires internet
-#' \dontrun{
 #' if (curl::has_internet()) {
 #'   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
 #'                 "main/data/subj099_block001.txt")
@@ -66,7 +65,6 @@
 #'   }, error = function(e) {
 #'     message("Failed to download data: ", e$message)
 #'   })
-#' }
 #' }
 #' 
 #' @author Raphael Hartmann & Anton Koger

@@ -39,7 +39,6 @@ that are not trials. The output is a \code{data.table}.
 }
 \examples{
 # Using example data from github which requires internet
-\dontrun{
 if (curl::has_internet()) {
   url <- "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv"
   
@@ -56,7 +55,6 @@ if (curl::has_internet()) {
   }, error = function(e) {
     message("Failed to download data: ", e$message)
   })
-}
 }
                          
 }
