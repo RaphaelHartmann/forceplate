@@ -111,20 +111,21 @@ in each trial, labeling conditions in each trial, and some more (see below). The
 # Using example data from GitHub which requires internet
 if (curl::has_internet()) {
   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
-                "main/data/subj099_block001.txt")
+                "main/data/subj013_block001.txt")
   
   # Safe download, handling potential errors
   tryCatch({
-    filenames <- tempfile(pattern = c("subj099_block001_"), 
+    filenames <- tempfile(pattern = c("subj013_block001_"), 
                           tmpdir = tempdir(), fileext = ".txt")
     download.file(url, filenames)
     
     # segment raw text file from Bioware
-    fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
-                             baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
-                             stimulus.trigger.list = c(2, 4, 8, 16),
-                             response.trigger.list = c(32,64),
-                             cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+    fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 128,
+                             baseline.intv = c(0, 215), start.trigger = 128, start.prepend = 0,
+                             stimulus.trigger.list = c(1, 2, 4, 8),
+                             response.trigger.list = c(32, 64),
+                             cond.trigger.list = list(stimulus = c(1, 2, 4, 8), 
+                                                      correctness = c(32, 64)))
     
     # Clean up
     unlink(filenames)

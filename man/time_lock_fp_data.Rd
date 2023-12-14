@@ -69,15 +69,16 @@ if (curl::has_internet()) {
     filenames <- tempfile(pattern = c("subj099_block001_"), 
                           tmpdir = tempdir(), fileext = ".txt")
     download.file(url, filenames)
-    fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 1,
-                             baseline.intv = c(-100, 100), start.trigger = 1, start.prepend = 0,
-                             stimulus.trigger.list = c(2, 4, 8, 16),
-                             response.trigger.list = c(32,64),
-                             cond.trigger.list = list(location_compat = c(2, 4, 8, 16)))
+    fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 128,
+                             baseline.intv = c(0, 215), start.trigger = 128, start.prepend = 0,
+                             stimulus.trigger.list = c(1, 2, 4, 8),
+                             response.trigger.list = c(32, 64),
+                             cond.trigger.list = list(stimulus = c(1, 2, 4, 8), 
+                                                      correctness = c(32, 64)))
     
     # Response-locking with 2 bins before and 2 bins after response onset. Each bin is 100 ms.
     tl.dt <- time_lock_fp_data(fp.dt = fp.dt, vars = c("Mx", "My"), 
-                               time.lock.trigger = c(32, 64), bins = c(-200, 200), n.bins = 4, 
+                               time.lock.trigger = c(1,2,4,8), bins = c(-150, 150), n.bins = 2, 
                                FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))))
     
     # Clean up
