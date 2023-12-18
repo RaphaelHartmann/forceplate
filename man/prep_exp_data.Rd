@@ -40,15 +40,15 @@ that are not trials. The output is a \code{data.table}.
 \examples{
 # Using example data from github which requires internet
 if (curl::has_internet()) {
-  url <- "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj099.csv"
+  url <- "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj13_exp_data.csv"
   
   # Safe download, handling potential errors
   tryCatch({
-    filenames <- tempfile(pattern = c("subj099_"), tmpdir = tempdir(), fileext = ".csv")
+    filenames <- tempfile(pattern = c("subj13_exp_data"), tmpdir = tempdir(), fileext = ".csv")
     download.file(url, filenames)
     
     # prepare experimental data
-    exp.dt <- prep_exp_data(filenames = filenames, excl.vars = c(1,2,3,4))
+    exp.dt <- prep_exp_data(filenames = filenames, excl.vars = 2:5)
     
     # Clean up
     unlink(filenames)

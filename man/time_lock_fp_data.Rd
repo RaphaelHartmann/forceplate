@@ -60,13 +60,14 @@ or response onset etc.
 }
 \examples{
 # Using example data from github which requires internet
+\donttest{ # takes longer than 5 seconds
 if (curl::has_internet()) {
   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
-                "main/data/subj099_block001.txt")
+                "main/data/subj013_block001.txt")
   
   # Safe download, handling potential errors
   tryCatch({
-    filenames <- tempfile(pattern = c("subj099_block001_"), 
+    filenames <- tempfile(pattern = c("subj013_block001_"), 
                           tmpdir = tempdir(), fileext = ".txt")
     download.file(url, filenames)
     fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 128,
@@ -86,6 +87,7 @@ if (curl::has_internet()) {
   }, error = function(e) {
     message("Failed to download data: ", e$message)
   })
+}
 }
 
 }
