@@ -40,7 +40,8 @@ that are not trials. The output is a \code{data.table}.
 \examples{
 # Using example data from github which requires internet
 if (curl::has_internet()) {
-  url <- "https://raw.githubusercontent.com/RaphaelHartmann/forceplate/main/data/subj13_exp_data.csv"
+  url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
+                "main/data/subj13_exp_data.csv")
   
   # Safe download, handling potential errors
   tryCatch({
