@@ -109,6 +109,7 @@ in each trial, labeling conditions in each trial, and some more (see below). The
 }
 \examples{
 # Using example data from GitHub which requires internet
+\donttest{ # takes longer than 5 seconds
 if (curl::has_internet()) {
   url <- paste0("https://raw.githubusercontent.com/RaphaelHartmann/forceplate/",
                 "main/data/subj013_block001.txt")
@@ -132,6 +133,7 @@ if (curl::has_internet()) {
   }, error = function(e) {
     message("Failed to download data: ", e$message)
   })
+}
 }
 
 }
