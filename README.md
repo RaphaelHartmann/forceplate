@@ -4,7 +4,7 @@
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/forceplate)](https://cran.r-project.org/package=forceplate)
 [![License](https://img.shields.io/badge/license-GPL(>=2)-0A7FC4.svg)](http://www.gnu.org/licenses/gpl-2.0.html)
 
-Process raw force-plate time series data (txt-files) by segmenting them into trials and, if needed, calculating (user-defined) descriptive statistics of variables for user-defined time bins (relative to trigger onsets) for each trial. When segmenting, the data a baseline correction, a filter, and a data imputation can be applied if needed. Experimental data can also be processed and combined with the segmented force-plate data. This procedure is suggested by Johannsen et al. (2023) and some of the options (e.g., choice of low-pass filter) are also suggested by Winter (2009).
+Process raw force-plate time series data (txt-files) by segmenting them into trials and, if needed, calculating (user-defined) descriptive statistics of variables for user-defined time bins (relative to trigger onsets) for each trial. When segmenting the data, a baseline correction, a filter, and a data imputation can be applied if needed. Experimental data can also be processed and combined with the segmented force-plate data. This procedure is suggested by Johannsen et al. (2023) and some of the options (e.g., choice of low-pass filter) are also suggested by Winter (2009).
 
 ## Installation
 ``` r
