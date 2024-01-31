@@ -75,10 +75,10 @@
 #' @importFrom utils tail txtProgressBar setTxtProgressBar
 #' @importFrom stats sd
 #' @importFrom data.table ":=" copy setattr setnames
-time_lock_fp_data <- function(fp.dt, vars,
-                              time.lock.trigger,
-                              bins, bin.width = NULL, n.bins = NULL,
-                              FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x)))) {
+time_lock_stats <- function(fp.dt, vars,
+                            time.lock.trigger,
+                            bins, bin.width = NULL, n.bins = NULL,
+                            FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x)))) {
 
   verbose = FALSE
   
