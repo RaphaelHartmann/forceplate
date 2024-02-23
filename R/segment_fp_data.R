@@ -34,13 +34,13 @@
 #'       \code{time = "fp_time_name"} in the \code{variable.names} list. The left hand side must be an expression 
 #'       that contains the string "time". The right hand side must be the actual variable name in your raw force-plate data
 #'       you want to replace.
-#'     \item the parallel port variable: if your force-plate data does not contain variables with the string "port" in it
-#'       or you want to rename the port variables in the force-plate data, you can specify 
-#'       \code{port1 = "fp_port1_name"}, \code{port2 = "fp_port2_name"}, \code{port3 = "fp_port3_name"}, and so on, in the 
-#'       \code{variable.names} list. The left hand side must be the string "port" followed by a number. The right hand side
+#'     \item the parallel-port pin variable: if your force-plate data does not contain variables with the string "pin" in it
+#'       or you want to rename the pin variables in the force-plate data, you can specify 
+#'       \code{pin1 = "fp_pin1_name"}, \code{pin2 = "fp_pin2_name"}, \code{pin3 = "fp_pin3_name"}, and so on, in the 
+#'       \code{variable.names} list. The left hand side must be the string "pin" followed by a number. The right hand side
 #'       must be the actual variable name in the force-plate data you want to replace.
 #'     \item measurement variables: if you wish to rename some measurement variables in your force-plate data you can do so. 
-#'       The only restriction being that the right hand side does not contain the strings "time" nor "port". For example
+#'       The only restriction being that the right hand side does not contain the strings "time" nor "pin". For example
 #'       \code{y_Force = "Fy"} is allowed. But we recommend sticking with the six basic measurement variable names
 #'       "Fx", "Fy", "Fz", "Mx", "My", and "Mz".
 #'   }
@@ -186,12 +186,12 @@ segment_fp_data <- function(filenames, n.trials,
   if (!is.null(variable.names)) {
     if (any(!as.character(unlist(variable.names)) %in% old.names)) stop("make sure all names in variable.names are in the data as well")
   }
-  new.names <- set_port_names(variable.names, old.names)
+  new.names <- set_pin_names(variable.names, old.names)
   new.names <- set_time_name(variable.names, new.names)
   new.names <- set_measure_names(variable.names, new.names)
-  port.names <- new.names[which(grepl("port", new.names))]
+  pin.names <- new.names[which(grepl("pin", new.names))]
   time.name <- new.names[which(grepl("time", new.names))[1]]
-  measure.names <- new.names[which(!new.names %in% c(time.name, port.names))]
+  measure.names <- new.names[which(!new.names %in% c(time.name, pin.names))]
   if (az0) measure.names.az0 <- c(measure.names, c("CoPx", "CoPy"))
   
   # CREATE SOME CONSTANT OBJECTS
@@ -228,10 +228,10 @@ segment_fp_data <- function(filenames, n.trials,
     if (az0) setcolorder(tmp.dt, c(time.name, measure.names.az0))
     # tmp.dt[, Tz_new:=(Mz)*1000 - (Fy)*(CoPx) + (Fx)*(CoPy)]
     
-    # CALCULATE EVENTS BY TRANSFORMATION OF PORT AND BYTE TO DECIMAL
-    port.ind <- which(colnames(tmp.dt) %in% port.names)
-    byte <- tmp.dt[, lapply(.SD, function(x) x > 1.5), .SDcols = port.ind]
-    tmp.dt[, events := event_encoder(byte = byte, port.ind = port.ind)]
+    # CALCULATE EVENTS BY TRANSFORMATION OF PIN AND BYTE TO DECIMAL
+    pin.ind <- which(colnames(tmp.dt) %in% pin.names)
+    byte <- tmp.dt[, lapply(.SD, function(x) x > 1.5), .SDcols = pin.ind]
+    tmp.dt[, events := event_encoder(byte = byte, pin.ind = pin.ind)]
     setcolorder(tmp.dt, c("events", setdiff(names(tmp.dt), "events")))
     rm(byte); gc()
     
@@ -371,7 +371,7 @@ segment_fp_data <- function(filenames, n.trials,
           dCoP.names <- c("dCoPx", "dCoPy")
           bioware.dt$forceplate[[j]][, (dCoP.names) := list(c(diff(CoPx), NaN), c(diff(CoPy), NaN))] # .()
           bioware.dt$forceplate[[j]][, (dCoP.names) := list(dCoPx - meansdiff[[j]]$CoPx, dCoPy - meansdiff[[j]]$CoPy)] # .()
-          setcolorder(bioware.dt$forceplate[[j]], c("events", time.name, measure.names.az0, dCoP.names, port.names))
+          setcolorder(bioware.dt$forceplate[[j]], c("events", time.name, measure.names.az0, dCoP.names, pin.names))
           bioware.dt$forceplate[[j]][, (c("CoPx", "CoPy")) := list(CoPx - means[[j]]$CoPx, CoPy - means[[j]]$CoPy)] # .()
         }
         bioware.dt$forceplate[[j]][ , (measure.names) := lapply(measure.names, function(nam) .SD[[nam]] - means[[j]][[nam]]), .SDcols = measure.names]

@@ -32,10 +32,10 @@ clean_rle <- function(rle) {
 
 vec_seq <- Vectorize(seq.default, vectorize.args = c("from", "to"), SIMPLIFY = FALSE)
 
-event_encoder <- function(byte, port.ind) {
-  powers <- 2^(0:(length(port.ind)-1))
+event_encoder <- function(byte, pin.ind) {
+  powers <- 2^(0:(length(pin.ind)-1))
   events <- numeric(nrow(byte))
-  for(ind in 1:length(port.ind)) {
+  for(ind in 1:length(pin.ind)) {
     events <- events + byte[[ind]] * powers[ind]
   }
   return(events)
@@ -178,36 +178,36 @@ filter_w_padding <- function(bf, vec, time) {
   
 }
 
-set_port_names <- function(variable.names, old.names) {
+set_pin_names <- function(variable.names, old.names) {
   if (is.null(variable.names)) {
-    if (any(grepl("port", old.names))) {
+    if (any(grepl("pin", old.names))) {
       return(old.names)
     } 
     if (any(old.names == "aux")) {
-      port.ind <- which(old.names == "aux")
-      old.names[port.ind] <- paste0("port", 1:length(port.ind))
+      pin.ind <- which(old.names == "aux")
+      old.names[pin.ind] <- paste0("pin", 1:length(pin.ind))
       return(old.names)
     } 
-    stop("please use variable.names to specify which variables correspond to the port1, port2, etc.")
+    stop("please use variable.names to specify which variables correspond to the pin1, pin2, etc.")
   }
   varnams <- names(variable.names)
-  if (any(grepl("port[1-9]+", varnams))) {
-    port.ind.vn <- which(grepl("port[1-9]+", varnams))
-    port.names <- as.character(unlist(variable.names))[port.ind.vn]
-    if (!all(port.names %in% old.names)) stop("at least some of the characters provided in variable.names for the ports do not match with the data")
-    port.ind <- which(old.names %in% port.names)
-    old.names[port.ind] <- varnams[port.ind.vn]
+  if (any(grepl("pin[1-9]+", varnams))) {
+    pin.ind.vn <- which(grepl("pin[1-9]+", varnams))
+    pin.names <- as.character(unlist(variable.names))[pin.ind.vn]
+    if (!all(pin.names %in% old.names)) stop("at least some of the characters provided in variable.names for the pins do not match with the data")
+    pin.ind <- which(old.names %in% pin.names)
+    old.names[pin.ind] <- varnams[pin.ind.vn]
     return(old.names)
   }
-  if (any(grepl("port", old.names))) {
+  if (any(grepl("pin", old.names))) {
     return(old.names)
   } 
   if (any(old.names == "aux")) {
-    port.ind <- which(old.names == "aux")
-    old.names[port.ind] <- paste0("port", 1:length(port.ind))
+    pin.ind <- which(old.names == "aux")
+    old.names[pin.ind] <- paste0("pin", 1:length(pin.ind))
     return(old.names)
   } 
-  stop("please use variable.names to specify which variables correspond to the port1, port2, etc.")
+  stop("please use variable.names to specify which variables correspond to the pin1, pin2, etc.")
 }
 
 set_time_name <- function(variable.names, old.names) {
@@ -229,7 +229,7 @@ set_time_name <- function(variable.names, old.names) {
   if (any(grepl("time", old.names))) {
     return(old.names)
   } 
-  stop("please use variable.names to specify which variable corresponds to the port1, port2, etc.")
+  stop("please use variable.names to specify which variable corresponds to the pin1, pin2, etc.")
 }
 
 set_measure_names <- function(variable.names, old.names) {
@@ -250,12 +250,12 @@ set_measure_names <- function(variable.names, old.names) {
     } else {
       time.ind <- tmp.time.ind  
     }
-    ports.ind <- which(grepl("port", varnams.left) | grepl("aux", varnams.left))
-    if (length(variable.names) == length(ports.ind) + length(time.ind)) {
+    pins.ind <- which(grepl("pin", varnams.left) | grepl("aux", varnams.left))
+    if (length(variable.names) == length(pins.ind) + length(time.ind)) {
       return(old.names)
     }
-    measures.left <- varnams.left[-c(time.ind, ports.ind)]
-    measures.right <- varnams.right[-c(time.ind, ports.ind)]
+    measures.left <- varnams.left[-c(time.ind, pins.ind)]
+    measures.right <- varnams.right[-c(time.ind, pins.ind)]
     measures.ind <- which(old.names %in% measures.right)
     old.names[measures.ind] <- measures.left
     return(old.names)

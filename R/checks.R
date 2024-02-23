@@ -114,5 +114,5 @@ check_variable_names <- function(x) {
 #   if (!is.list(x)) stop(paste0(deparse(substitute(x)), " must be a named list of numeric elements"))
 #   if (is.null(names(x))) stop(paste0(deparse(substitute(x)), " must be a named list of numeric elements"))
 #   if (any(!necessary.names %in% names(x))) stop(paste0(deparse(substitute(x)), " must at least contain ", necessary.names))
-#   if (!any(grepl("port[0-9]+", names(x)))) stop(paste0(deparse(substitute(x)), "must contain elements with the name \"post1\", \"post2\", \"post3\", ... with the indices for the parallel ports"))
+#   if (!any(grepl("pin[0-9]+", names(x)))) stop(paste0(deparse(substitute(x)), "must contain elements with the name \"post1\", \"post2\", \"post3\", ... with the indices for the parallel ports"))
 # }
