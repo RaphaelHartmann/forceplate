@@ -13,7 +13,7 @@ install.packages("forceplate")
 
 # Alternatively, you might install it from GitHub via devtools:
 install.packages("devtools")
-devtools::install_github("RaphaelHartmann/forceplate"))
+devtools::install_github("RaphaelHartmann/forceplate")
 ```
 
 ## References
