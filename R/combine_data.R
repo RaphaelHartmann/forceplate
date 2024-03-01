@@ -33,16 +33,18 @@ combine_data <- function(dt1, dt2) {
   check_character_in_colnames(c("subj", "block", "trial"), col.names1)
   check_character_in_colnames(c("subj", "block", "trial"), col.names2)
     
-  if (length(col.names1) == length(col.names2) & all(sort(col.names1)==sort(col.names2))) { # append
+  if (length(col.names1) == length(col.names2)) { # append
     
-    if (order(col.names1) != order(col.names2)) {
-      setcolorder(dt2.copy, col.names1)
+    if (all(sort(col.names1)==sort(col.names2))) {
+      if (order(col.names1) != order(col.names2)) {
+        setcolorder(dt2.copy, col.names1)
+      }
+      dt.fin <- copy(rbindlist(list(dt1.copy, dt2.copy)))
+      if (inherits(dt.fin, "fp.segm")) {
+        dt.fin[, forceplate := lapply(forceplate, FUN = function(x) copy(x))]
+      }
+      return(dt.fin)
     }
-    dt.fin <- copy(rbindlist(list(dt1.copy, dt2.copy)))
-    if (inherits(dt.fin, "fp.segm")) {
-      dt.fin[, forceplate := lapply(forceplate, FUN = function(x) copy(x))]
-    }
-    return(dt.fin)
     
   } else if (nrow(dt1.copy) == nrow(dt2.copy)) { # merge
     
