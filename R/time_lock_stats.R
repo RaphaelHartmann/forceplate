@@ -58,9 +58,9 @@
 #'                                                       correctness = c(32, 64)))
 #'     
 #'     # Response-locking with 2 bins before and 2 bins after response onset. Each bin is 100 ms.
-#'     tl.dt <- time_lock_fp_data(fp.dt = fp.dt, vars = c("Mx", "My"), 
-#'                                time.lock.trigger = c(1,2,4,8), bins = c(-150, 150), n.bins = 2, 
-#'                                FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))))
+#'     tl.dt <- time_lock_stats(fp.dt = fp.dt, vars = c("Mx", "My"), 
+#'                              time.lock.trigger = c(1,2,4,8), bins = c(-150, 150), n.bins = 2, 
+#'                              FUN = list(mean = mean, sd = sd, range = function(x) diff(range(x))))
 #'     
 #'     # Clean up
 #'     unlink(filenames)
