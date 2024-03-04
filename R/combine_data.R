@@ -11,7 +11,7 @@
 #'   share the same class, or of the class \code{dt.comb}.
 #' @author Raphael Hartmann & Anton Koger
 #' @export
-#' @importFrom data.table ".SD" setcolorder rbindlist fintersect
+#' @importFrom data.table ".SD" copy setcolorder rbindlist fintersect
 combine_data <- function(dt1, dt2) {
   
   # FOR USE WITH DATA.TABLE IN PACKAGES
@@ -49,7 +49,7 @@ combine_data <- function(dt1, dt2) {
   } else if (nrow(dt1.copy) == nrow(dt2.copy)) { # merge
     
     if (nrow(fintersect(dt1.copy[, .SD, .SDcols = c("subj", "block", "trial")], dt2.copy[, .SD, .SDcols = c("subj", "block", "trial")])) == nrow(dt1.copy)) {
-      dt.fin <- copy(merge(dt2.copy, dt1.copy, by = c("subj", "block", "trial")))
+      dt.fin <- copy(merge(dt1.copy, dt2.copy, by = c("subj", "block", "trial")))
       if (inherits(dt.fin, "fp.segm")) {
         dt.fin[, forceplate := lapply(forceplate, FUN = function(x) copy(x))]
         setattr(dt.fin, "class", c("dt.comb", class(dt.fin)))
