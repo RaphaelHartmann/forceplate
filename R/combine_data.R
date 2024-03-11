@@ -7,10 +7,15 @@
 #' @param dt1 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}.
 #' @param dt2 A \code{data.table} of the class \code{fp.segm}, \code{fp.tl}, or \code{exp.prep}. Make
 #'   sure the two data.table have either the same number of rows or the same columns.
-#' @param by list of three variable names in the experimental data that reflect the
+#' @param by A list of three variable names in the experimental data that reflect the
 #'   subj (subject number), block (block number), and trial (trial number) in the 
 #'   force-plate data. This argument is only necessary for combining experimental
 #'   data with force-plate data.
+#' @param continuous A logical value. Default is \code{FALSE}, meaning the variable for
+#'   the trials in the used experimental data.table counts for each block separately,
+#'   that is in each block it counts from 1 to the number of trials in that block. If 
+#'   \code{TRUE} it is assumed that the trials are counted from 1 to the total number 
+#'   of trials of a subject. 
 #' @return A \code{data.table} either of the same class as \code{dt1} and \code{dt2}, if they
 #'   share the same class, or of the class \code{dt.comb}.
 #' @author Raphael Hartmann & Anton Koger
@@ -18,7 +23,8 @@
 #' @importFrom data.table ".SD" copy fintersect rbindlist setcolorder setnames
 combine_data <- function(dt1, 
                          dt2, 
-                         by = list(subj="subj", block="block", trial="trial")) {
+                         by = list(subj="subj", block="block", trial="trial"),
+                         continuous = FALSE) {
   
   # FOR USE WITH DATA.TABLE IN PACKAGES
   forceplate <- NULL
@@ -63,6 +69,11 @@ combine_data <- function(dt1,
     
     dt1.copy[, c("subj", "block", "trial") := lapply(.SD, as.integer), .SDcols = c("subj", "block", "trial")]
     dt2.copy[, c("subj", "block", "trial") := lapply(.SD, as.integer), .SDcols = c("subj", "block", "trial")]
+    
+    if (continuous) {
+      if (inherits(dt1.copy, "exp.prep")) dt1.copy[, trial := seq_len(.N), by = .(subj, block)]
+      if (inherits(dt2.copy, "exp.prep")) dt2.copy[, trial := seq_len(.N), by = .(subj, block)]
+    }
     
     if (nrow(fintersect(dt1.copy[, .SD, .SDcols = c("subj", "block", "trial")], dt2.copy[, .SD, .SDcols = c("subj", "block", "trial")])) == nrow(dt1.copy)) {
       dt.fin <- copy(merge(dt1.copy, dt2.copy, by = c("subj", "block", "trial")))
