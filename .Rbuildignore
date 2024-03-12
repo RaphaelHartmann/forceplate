@@ -3,3 +3,5 @@
 ^data$
 ^shell\.nix$
 ^_libs$
+^README\.md$
+^\./man/figures$
