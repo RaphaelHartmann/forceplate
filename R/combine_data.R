@@ -20,14 +20,14 @@
 #'   share the same class, or of the class \code{dt.comb}.
 #' @author Raphael Hartmann & Anton Koger
 #' @export
-#' @importFrom data.table ".SD" copy fintersect rbindlist setcolorder setnames
+#' @importFrom data.table ".N" ".SD" copy fintersect rbindlist setcolorder setnames
 combine_data <- function(dt1, 
                          dt2, 
                          by = list(subj="subj", block="block", trial="trial"),
                          continuous = FALSE) {
   
   # FOR USE WITH DATA.TABLE IN PACKAGES
-  forceplate <- NULL
+  forceplate <- trial <- subj <- block <- . <- NULL
   
   # CHECKS
   check_data.table(dt1)
