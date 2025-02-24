@@ -105,11 +105,12 @@
 #'     
 #'     # segment raw text file from Bioware
 #'     fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 128,
-#'                              baseline.intv = c(0, 215), start.trigger = 128, prepend.ms = 0,
+#'                              baseline.intv = c(0, 215), start.trigger = 128,
 #'                              stimulus.trigger.list = c(1, 2, 4, 8),
 #'                              response.trigger.list = c(32, 64),
 #'                              cond.trigger.list = list(stimulus = c(1, 2, 4, 8), 
-#'                                                       correctness = c(32, 64)))
+#'                                                       correctness = c(32, 64)),
+#'                              control = list(prepend.ms = 0))
 #'     
 #'     # Clean up
 #'     unlink(filenames)
@@ -140,19 +141,23 @@ segment_fp_data <- function(filenames, n.trials,
   verbose = FALSE
   
   # FOR USE WITH DATA.TABLE IN PACKAGES
-  forceplate <- subjNR <- blockNR <- CoPx <- CoPy <- Fx <- Fy <- Fz <- Mx <- My <- Mz <- events <- response <- rt <- dCoPx <- dCoPy <- NULL
+  forceplate <- event <- subjNR <- blockNR <- CoPx <- CoPy <- Fx <- Fy <- Fz <- Mx <- My <- Mz <- events <- response <- rt <- dCoPx <- dCoPy <- NULL
   
   # FOR CONTROL PARAMETER
-  az0 <- ifelse("az0" %in% names(control), control$az0, 0)
-  prepend.ms <- ifelse("prepend.ms" %in% names(control), control$prepend.ms, 0)
-  prepend.event <- ifelse("prepend.event" %in% names(control), control$prepend.event, NULL)
-  prepend.data <- ifelse("prepend.data" %in% names(control), control$prepend.data, FALSE)
-  append.ms <- ifelse("append.ms" %in% names(control), control$append.ms, 0)
-  append.event <- ifelse("append.event" %in% names(control), control$append.event, NULL)
-  append.data <- ifelse("append.data" %in% names(control), control$append.data, FALSE)
-  sort <- ifelse("sort" %in% names(control), control$sort, TRUE)
-  imputation <- ifelse("imputation" %in% names(control), control$imputation, NULL)
-  variable.names <- ifelse("variable.names" %in% names(control), control$variable.names, NULL)
+  az0 <- prepend.ms <- append.ms <- 0
+  prepend.event <- append.event <- imputation <- variable.names <- NULL
+  prepend.data <- append.data <- FALSE
+  sort <- TRUE
+  if ("az0" %in% names(control)) az0 <- control$az0
+  if ("prepend.ms" %in% names(control)) prepend.ms <- control$prepend.ms
+  if ("prepend.event" %in% names(control)) prepend.event <- control$prepend.event
+  if ("prepend.data" %in% names(control)) prepend.data <- control$prepend.data
+  if ("append.ms" %in% names(control)) append.ms <- control$append.ms
+  if ("append.event" %in% names(control)) append.event <- control$append.event
+  if ("append.data" %in% names(control)) append.data <- control$append.data
+  if ("sort" %in% names(control)) sort <- control$sort
+  if ("imputation" %in% names(control)) imputation <- control$imputation
+  if ("variable.names" %in% names(control)) variable.names <- control$variable.names
   
   # CHECKS
   check_character_vector(filenames)
@@ -294,8 +299,8 @@ segment_fp_data <- function(filenames, n.trials,
     if (prepend.ms != 0) {
       bioware.dt[, forceplate := lapply(forceplate, function(dt) {
         dt <- copy(dt)
-        if (!is.null(prepend.event)) dt[1:round(samp.factor*prepend.ms), event := prepend.event]
-        if (prepend.data) dt[1:round(samp.factor$prepend.ms), (measure.names) := NA]
+        if (!is.null(prepend.event)) dt[1:round(samp.factor*prepend.ms), events := prepend.event]
+        if (prepend.data) dt[1:round(samp.factor*prepend.ms), (measure.names) := NA]
         return(dt)
       })]
     }
@@ -303,8 +308,8 @@ segment_fp_data <- function(filenames, n.trials,
       bioware.dt[1:(.N - 1), forceplate := lapply(forceplate, function(dt) {
         dt <- copy(dt)
         total_rows <- nrow(dt)
-        if (!is.null(append.event)) dt[(total_rows - round(samp.factor$append.ms) + 1):total_rows, event := append.event]
-        if (prepend.data) dt[(total_rows - round(samp.factor$append.ms) + 1):total_rows, (measure.names) := NA]
+        if (!is.null(append.event)) dt[(total_rows - round(samp.factor*append.ms) + 1):total_rows, events := append.event]
+        if (prepend.data) dt[(total_rows - round(samp.factor*append.ms) + 1):total_rows, (measure.names) := NA]
         return(dt)
       })]
     }
