@@ -5,3 +5,4 @@
 .DS_Store
 .quarto
 forceplate.Rproj
+shell.nix
