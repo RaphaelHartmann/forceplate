@@ -9,9 +9,6 @@
 #' @param filenames A (vector of) character(s) providing the raw force-plate file name(s). Files should be in tab-delimited .txt-format. 
 #' @param n.trials A (vector of) number(s) providing the number of trial (per filename).
 #' @param start.trigger A (vector of) number(s) providing the trigger(s) marking the beginning of a trial.
-#' @param start.prepend A number giving the number of milliseconds to prepend before the \code{start.trigger}.
-#'   If this is not 0 then each trial will have additional \code{start.prepend} milliseconds added at the
-#'   beginning of each trial.
 #' @param stimulus.trigger.list If a trial contains one task only, then a vector providing the trigger(s) 
 #'   marking the onset of the stimulus. If a trial contains more than one task, then a named list of vectors
 #'   providing the trigger(s) marking the onset of stimuli. For example, 
@@ -19,43 +16,65 @@
 #' @param response.trigger.list Same as \code{stimulus.trigger.list} but with trigger(s) marking the onset
 #'   of responses. For example, \code{auditory = c(32, 33, 34, 36), visual = c(128, 129, 130, 132)}.
 #' @param baseline.trigger A (vector of) number(s) providing the trigger number(s) providing the reference for
-#'   the intervall for the baseline correction. For example, if set to 1 the onset of event with trigger 1 is
+#'   the interval for the baseline correction. For example, if set to 1 the onset of event with trigger 1 is
 #'   used as zero point for the next argument (\code{baseline.intv}). Use 0 to indicate that you wish to use no
 #'   baseline correction.
 #' @param baseline.intv A vector of length 2 providing the lower and upper bounds of the interval that will
 #'   be used as baseline interval (in milliseconds). For each measurement variable, the mean of the data points 
 #'   that fall into this interval will be subtracted from all data points within a trial.
 #' @param cond.trigger.list A named list of vectors providing the trigger(s) marking the conditions.
-#' @param variable.names If used (i.e., not NULL), a named list of names. This will rename the variables of the 
-#'   force-plate data. There are three cases to consider:
-#'   \itemize{
-#'     \item the time variable: if your force-plate data does not contain a variable with the string "time" in it
-#'       or you want to rename the time variable in the force-plate data, you can specify 
-#'       \code{time = "fp_time_name"} in the \code{variable.names} list. The left hand side must be an expression 
-#'       that contains the string "time". The right hand side must be the actual variable name in your raw force-plate data
-#'       you want to replace.
-#'     \item the parallel-port pin variable: if your force-plate data does not contain variables with the string "pin" in it
-#'       or you want to rename the pin variables in the force-plate data, you can specify 
-#'       \code{pin1 = "fp_pin1_name"}, \code{pin2 = "fp_pin2_name"}, \code{pin3 = "fp_pin3_name"}, and so on, in the 
-#'       \code{variable.names} list. The left hand side must be the string "pin" followed by a number. The right hand side
-#'       must be the actual variable name in the force-plate data you want to replace.
-#'     \item measurement variables: if you wish to rename some measurement variables in your force-plate data you can do so. 
-#'       The only restriction being that the right hand side does not contain the strings "time" nor "pin". For example
-#'       \code{y_Force = "Fy"} is allowed. But we recommend sticking with the six basic measurement variable names
-#'       "Fx", "Fy", "Fz", "Mx", "My", and "Mz".
-#'   }
 #' @param skip A number giving the number of lines in the raw force-plate data to skip. In BioWare this is 19. The real data
 #'   starts at line 20. Therefore the default value is set to 19.
-#' @param az0 Thickness parameter of the force plate in millimeter and negative. If this value (e.g., -41 for the Kistler 
-#'   force plate type 9260AA) is not 0 then the center of pressure in the x- and y-direction is calculated (like in
-#'   Johannsen et al., 2023) using this value.
 #' @param sampling.freq A number giving the sampling frequency. Typically 1000 Hz.
 #' @param cutoff.freq A number giving the cut-off frequency used for the low-pass 4th order Butterworth filter. If set to 0, 
 #'   no low-pass filter will be applied. Default is 10 Hz.
-#' @param imputation If you expect any NaNs in your raw force-plate data you might use this argument. Use either of the 
-#'   following options: "fmm", "periodic", "natural", "monoH.FC", or "hyman". These are method options in the 
-#'   \code{stats::spline()} function. Usually this option is not needed and the default (NULL) can be used.
-#' @param sort TRUE or FALSE. If TRUE the data will be sorted by subject number and block number.
+#' @param control List of additional options:
+#'   \itemize{
+#'     \item \code{az0} Thickness parameter of the force plate in millimeter and negative. If this value 
+#'       (e.g., -41 for the Kistler force plate type 9260AA) is not 0 then the center of pressure in the x- 
+#'       and y-direction is calculated (like in Johannsen et al., 2023) using this value.
+#'     \item \code{prepend.ms}: A number giving the number of milliseconds to prepend before the 
+#'       \code{start.trigger}. If this is not 0 then each trial will have additional \code{prepend.ms} 
+#'       milliseconds added at the beginning of each trial (potentially taken from the previous trial).
+#'     \item \code{prepend.event}: Overwrite the events of the prepended frames with a (new) event
+#'       number (integer). If set to \code{NULL} (default), the event numbers are kept as they are.
+#'     \item \code{prepend.data}: Overwrite the data of the prepended frames with NA? If set to \code{FALSE}
+#'       (default), the data is kept as it was (i.e., you might have data from the previous trial).
+#'     \item \code{append.ms}: A number giving the number of milliseconds to append after each trial.
+#'       If this is not 0 then each trial will have additional \code{append.ms} milliseconds added at the
+#'       end of each trial (potentially taken from the next trial).
+#'     \item \code{append.event}: Overwrite the events of the appended frames with a (new) event
+#'       number (integer). If set to \code{NULL} (default), the event numbers are kept as they are.
+#'       Note: this does not affect the last trial in each file, since this not followed directly
+#'       by a trial.
+#'     \item \code{append.data}: Overwrite the data of the appended frames with NA? If set to \code{FALSE}
+#'       (default), the data is kept as it was (i.e., you might have data from the next trial).
+#'       Note: this does not affect the last trial in each file, since this not followed directly
+#'       by a trial.
+#'     \item \code{sort} TRUE or FALSE. If TRUE (default) the data will be sorted by subject number and block number.
+#'     \item \code{imputation} If you expect any NaNs in your raw force-plate data you might use this argument. 
+#'       Use either of the following options: "fmm", "periodic", "natural", "monoH.FC", or "hyman". These are 
+#'       method options in the \code{stats::spline()} function. Usually this option is not needed and the 
+#'       default (NULL) can be used.
+#'     \item \code{variable.names} If used (i.e., not NULL), a named list of names. This will rename the variables of the 
+#'       force-plate data. There are three cases to consider:
+#'       \itemize{
+#'         \item the time variable: if your force-plate data does not contain a variable with the string "time" in it
+#'           or you want to rename the time variable in the force-plate data, you can specify 
+#'           \code{time = "fp_time_name"} in the \code{variable.names} list. The left hand side must be an expression 
+#'           that contains the string "time". The right hand side must be the actual variable name in your raw force-plate data
+#'           you want to replace.
+#'         \item the parallel-port pin variable: if your force-plate data does not contain variables with the string "pin" in it
+#'           or you want to rename the pin variables in the force-plate data, you can specify 
+#'           \code{pin1 = "fp_pin1_name"}, \code{pin2 = "fp_pin2_name"}, \code{pin3 = "fp_pin3_name"}, and so on, in the 
+#'           \code{variable.names} list. The left hand side must be the string "pin" followed by a number. The right hand side
+#'           must be the actual variable name in the force-plate data you want to replace.
+#'         \item measurement variables: if you wish to rename some measurement variables in your force-plate data you can do so. 
+#'           The only restriction being that the right hand side does not contain the strings "time" nor "pin". For example
+#'           \code{y_Force = "Fy"} is allowed. But we recommend sticking with the six basic measurement variable names
+#'           "Fx", "Fy", "Fz", "Mx", "My", and "Mz".
+#'       }
+#'   }
 #' @return A \code{data.table} of the class \code{fp.segm}.
 #'   The following variables are included in the \code{data.table}: 
 #'   \itemize{
@@ -86,7 +105,7 @@
 #'     
 #'     # segment raw text file from Bioware
 #'     fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 128,
-#'                              baseline.intv = c(0, 215), start.trigger = 128, start.prepend = 0,
+#'                              baseline.intv = c(0, 215), start.trigger = 128, prepend.ms = 0,
 #'                              stimulus.trigger.list = c(1, 2, 4, 8),
 #'                              response.trigger.list = c(32, 64),
 #'                              cond.trigger.list = list(stimulus = c(1, 2, 4, 8), 
@@ -108,22 +127,32 @@
 #' @importFrom signal butter
 #' @importFrom stringi stri_count_regex
 segment_fp_data <- function(filenames, n.trials,
-                            start.trigger, start.prepend = 0,
+                            start.trigger,
                             baseline.trigger, baseline.intv,
                             stimulus.trigger.list,
                             response.trigger.list, 
                             cond.trigger.list,
-                            variable.names = NULL,
                             skip = 19, 
-                            az0 = 0,
-                            sampling.freq = 1000, cutoff.freq = 10,
-                            imputation = NULL,
-                            sort = TRUE) {
+                            sampling.freq = 1000, 
+                            cutoff.freq = 10,
+                            control = NULL) {
   
   verbose = FALSE
   
   # FOR USE WITH DATA.TABLE IN PACKAGES
   forceplate <- subjNR <- blockNR <- CoPx <- CoPy <- Fx <- Fy <- Fz <- Mx <- My <- Mz <- events <- response <- rt <- dCoPx <- dCoPy <- NULL
+  
+  # FOR CONTROL PARAMETER
+  az0 <- ifelse("az0" %in% names(control), control$az0, 0)
+  prepend.ms <- ifelse("prepend.ms" %in% names(control), control$prepend.ms, 0)
+  prepend.event <- ifelse("prepend.event" %in% names(control), control$prepend.event, NULL)
+  prepend.data <- ifelse("prepend.data" %in% names(control), control$prepend.data, FALSE)
+  append.ms <- ifelse("append.ms" %in% names(control), control$append.ms, 0)
+  append.event <- ifelse("append.event" %in% names(control), control$append.event, NULL)
+  append.data <- ifelse("append.data" %in% names(control), control$append.data, FALSE)
+  sort <- ifelse("sort" %in% names(control), control$sort, TRUE)
+  imputation <- ifelse("imputation" %in% names(control), control$imputation, NULL)
+  variable.names <- ifelse("variable.names" %in% names(control), control$variable.names, NULL)
   
   # CHECKS
   check_character_vector(filenames)
@@ -144,7 +173,12 @@ segment_fp_data <- function(filenames, n.trials,
   }
   if (!is.null(variable.names)) check_variable_names(variable.names)
   check_interval(baseline.intv)
-  check_numeric_element(start.prepend)
+  check_numeric_element(prepend.ms)
+  if (!is.null(prepend.event)) check_numeric_element(prepend.event)
+  check_logical_element(prepend.data)
+  check_numeric_element(append.ms)
+  if (!is.null(append.event)) check_numeric_element(append.event)
+  check_logical_element(append.data)
   check_named_list_vectors(cond.trigger.list)
   check_numeric_element(skip)
   if (skip < 1) stop("skip must be larger than 0")
@@ -253,10 +287,27 @@ segment_fp_data <- function(filenames, n.trials,
     tmp.ind <- which(event.info$values %in% start.trigger)
     if (length(tmp.ind) != num.trials) stop(paste0("the current dataset should have ", num.trials, " trials, 
                                                    but start.trigger appears in ", length(tmp.ind)))
-    trial.info <- list(onset = event.info$onset[tmp.ind] - round(samp.factor*start.prepend))
-    trial.info$offset <- c(tail(trial.info$onset+round(samp.factor*start.prepend)-1, -1), nrow(tmp.dt))
+    trial.info <- list(onset = event.info$onset[tmp.ind] - round(samp.factor*prepend.ms))
+    trial.info$offset <- c(tail(trial.info$onset+round(samp.factor*prepend.ms)-1+round(samp.factor*append.ms), -1), nrow(tmp.dt))
     trial.ind <- vec_seq(trial.info$onset, trial.info$offset, 1)
     bioware.dt[, forceplate := lapply(trial.ind, FUN = function(x) copy(tmp.dt[x,]))]
+    if (prepend.ms != 0) {
+      bioware.dt[, forceplate := lapply(forceplate, function(dt) {
+        dt <- copy(dt)
+        if (!is.null(prepend.event)) dt[1:round(samp.factor*prepend.ms), event := prepend.event]
+        if (prepend.data) dt[1:round(samp.factor$prepend.ms), (measure.names) := NA]
+        return(dt)
+      })]
+    }
+    if (append.ms != 0) {
+      bioware.dt[1:(.N - 1), forceplate := lapply(forceplate, function(dt) {
+        dt <- copy(dt)
+        total_rows <- nrow(dt)
+        if (!is.null(append.event)) dt[(total_rows - round(samp.factor$append.ms) + 1):total_rows, event := append.event]
+        if (prepend.data) dt[(total_rows - round(samp.factor$append.ms) + 1):total_rows, (measure.names) := NA]
+        return(dt)
+      })]
+    }
     
     event.start.ind <- c(which(event.info$values %in% start.trigger), length(event.info$values)+1)
     event.trial.intv <- lapply(1:(length(event.start.ind) - 1), function(i) {
