@@ -133,11 +133,12 @@ if (curl::has_internet()) {
     
     # segment raw text file from Bioware
     fp.dt <- segment_fp_data(filenames = filenames, n.trials = 80, baseline.trigger = 128,
-                             baseline.intv = c(0, 215), start.trigger = 128, prepend.ms = 0,
+                             baseline.intv = c(0, 215), start.trigger = 128,
                              stimulus.trigger.list = c(1, 2, 4, 8),
                              response.trigger.list = c(32, 64),
                              cond.trigger.list = list(stimulus = c(1, 2, 4, 8), 
-                                                      correctness = c(32, 64)))
+                                                      correctness = c(32, 64)),
+                             control = list(prepend.ms = 0))
     
     # Clean up
     unlink(filenames)
