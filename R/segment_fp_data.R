@@ -145,7 +145,7 @@ segment_fp_data <- function(filenames, n.trials,
   
   # FOR CONTROL PARAMETER
   az0 <- prepend.ms <- append.ms <- 0
-  prepend.event <- append.event <- imputation <- variable.names <- NULL
+  prepend.event <- append.event <- imputation <- variable.names <- NULL;
   prepend.data <- append.data <- FALSE
   sort <- TRUE
   if ("az0" %in% names(control)) az0 <- control$az0
