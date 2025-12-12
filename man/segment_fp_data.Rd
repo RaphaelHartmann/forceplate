@@ -58,7 +58,7 @@ no low-pass filter will be applied. Default is 10 Hz.}
 \item \code{az0} Thickness parameter of the force plate in millimeter and negative. If this value
 (e.g., -41 for the Kistler force plate type 9260AA) is not 0 then the center of pressure in the x-
 and y-direction is calculated (like in Johannsen et al., 2023) using this value. The measure is in Nmm
-(Newton-millimeter).
+(Newton-millimeter), given the forces are in Newton and the moments in Nm (Newton-meter).
 \item \code{prepend.ms}: A number giving the number of milliseconds to prepend before the
 \code{start.trigger}. If this is not 0 then each trial will have additional \code{prepend.ms}
 milliseconds added at the beginning of each trial (potentially taken from the previous trial).
